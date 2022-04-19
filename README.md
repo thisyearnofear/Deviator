@@ -2,6 +2,10 @@
 
 Updated version of Kaim Maaloul's The Aviator, see his [Article on Codrops](http://tympanus.net/codrops/?p=26501), demo [Demo](http://tympanus.net/Tutorials/TheAviator/) and [GitHub](https://github.com/yakudoo/TheAviator).
 
+## Start
+
+Clone repository, run `npm ci` and then `npm run dev`.
+
 
 ## License
 
@@ -40,3 +44,50 @@ From freesound:
 Follow Michel: [Twitter](https://twitter.com/MichelOliverH)
 
 Follow Karim: [Twitter](https://twitter.com/yakudoo), [Codepen](http://codepen.io/Yakudoo/)
+
+
+## Updates over the original
+
+**08 April 2022**
+ - restructure code and use Typescript
+
+**07 April 2022**
+ - when replaying, remove all coins and enemies
+ - fix bug about the state handling after dying
+ - implement all audio
+ - find audio files
+      - propeller/airplane sound
+      - shooting simple, double, better
+      - background music
+      - picking up collectible
+      - collision with enemy
+      - collecting a coin
+
+**06 April 2022**
+ - airplane recoil
+ - make end screen after 5 levels
+ - make collectibles logic
+      - life: if life<3 and a small chance
+      - simple gun: level 2
+      - double gun: level 3
+      - better gun: level 4
+
+**05 April 2022**
+ - fix bug that no more enemies are spawning
+ - transfer to new three.js version
+ - design collectibles
+      - simple gun
+      - better gun
+      - double gun
+      - life
+ - complete simple gun, better gun and double gun
+
+**04 April 2022**
+ - design airplane's machine gun
+ - redesign coins
+ - each level has a different sea color
+ - remove energy bar
+ - show hearts as remaining hitpoints
+ - show new level entry prominently
+ - be able to shoot
+ - copy initial game
