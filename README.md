@@ -2,9 +2,12 @@
 
 Updated version of Kaim Maaloul's The Aviator, see his [Article on Codrops](http://tympanus.net/codrops/?p=26501), demo [Demo](http://tympanus.net/Tutorials/TheAviator/) and [GitHub](https://github.com/yakudoo/TheAviator).
 
+This repository is the archive of the source code for the Codrops article and will not get updated.
+
+
 ## Start
 
-Clone repository, run `npm ci` and then `npm run dev`.
+Clone repository, in the code directory run `php -S localhost:8123` and in your browser visit [http://localhost:8123/](http://localhost:8123/).
 
 
 ## License
