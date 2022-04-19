@@ -51,9 +51,6 @@ Follow Karim: [Twitter](https://twitter.com/yakudoo), [Codepen](http://codepen.i
 
 ## Updates over the original
 
-**08 April 2022**
- - restructure code and use Typescript
-
 **07 April 2022**
  - when replaying, remove all coins and enemies
  - fix bug about the state handling after dying
