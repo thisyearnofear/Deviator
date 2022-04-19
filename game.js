@@ -72,15 +72,6 @@ function createAirplaneMesh() {
 	mesh.add(windshield);
 
 	var geomPropeller = new THREE.BoxGeometry(20, 10, 10, 1, 1, 1);
-	// geomPropeller.vertices[4].y-=5;
-	// geomPropeller.vertices[4].z+=5;
-	// geomPropeller.vertices[5].y-=5;
-	// geomPropeller.vertices[5].z-=5;
-	// geomPropeller.vertices[6].y+=5;
-	// geomPropeller.vertices[6].z+=5;
-	// geomPropeller.vertices[7].y+=5;
-	// geomPropeller.vertices[7].z-=5;
-	// TODO: Transfer the above changes
 	geomPropeller.attributes.position.array[4*3+1] -= 5
 	geomPropeller.attributes.position.array[4*3+2] += 5
 	geomPropeller.attributes.position.array[5*3+1] -= 5
@@ -1426,9 +1417,9 @@ function createSky() {
 
 
 function loop() {
-	newTime = new Date().getTime();
+	newTime = new Date().getTime()
 	const deltaTime = newTime - oldTime
-	oldTime = newTime;
+	oldTime = newTime
 
 	if (game.status == 'playing') {
 		if (!game.paused) {
@@ -1451,7 +1442,6 @@ function loop() {
 				if (game.level === world.levelCount) {
 					game.status = 'finished'
 					setFollowView()
-					// TODO: slowly sverve camera to sit behind pilot
 					ui.showScoreScreen()
 				} else {
 					ui.informNextLevel(game.level)
@@ -1463,7 +1453,7 @@ function loop() {
 			}
 
 			// span collectibles
-			if (game.lifes<world.maxLifes && (game.distance-game.lastLifeSpawn)>world.pauseLifeSpawn && Math.random()<0.01) {  // TODO: should depend on deltaTime
+			if (game.lifes<world.maxLifes && (game.distance-game.lastLifeSpawn)>world.pauseLifeSpawn && Math.random()<0.01) {
 				game.lastLifeSpawn = game.distance
 				spawnLifeCollectible()
 			}
@@ -1588,10 +1578,10 @@ class UI {
 		this._elemsLifes = document.querySelectorAll('#lifes img')
 		this._elemCoinsCount = document.getElementById('coinsValue')
 
-		/*document.querySelector('#start-screen button').onclick = () => {
-			document.getElementById('start-screen').classList.add('hidden')
+		document.querySelector('#intro-screen button').onclick = () => {
+			document.getElementById('intro-screen').classList.remove('visible')
 			onStart()
-		}*/
+		}
 
 		document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
 		document.addEventListener('keyup', this.handleKeyUp.bind(this), false)
@@ -1648,20 +1638,20 @@ class UI {
 		this.mouseButtons[event.button] = true
 
 		if (event.button===1 && game.status==='playing') {
-			airplane.shoot()  // TODO
+			airplane.shoot()
 		}
 	}
 
 	handleKeyDown(event) {
 		this.keysDown[event.code] = true
 		if (event.code === 'KeyP') {
-			game.paused = !game.paused  // TODO
+			game.paused = !game.paused
 		}
 		if (event.code === 'Space') {
-			airplane.shoot()  // TODO
+			airplane.shoot()
 		}
 		if (event.code === 'Enter') {
-			if (game.fpv) {  // TODO
+			if (game.fpv) {
 				setSideView()
 			} else {
 				setFollowView()
@@ -1677,9 +1667,9 @@ class UI {
 		this.mouseButtons[event.button] = false
 		event.preventDefault()
 
-		if (game.status == "waitingReplay") {  // TODO
+		if (game && game.status == "waitingReplay") {
 			resetMap()
-			startMap()
+			ui.informNextLevel(1)
 			game.paused = false
 			sea.updateColor()
 			sea2.updateColor()
@@ -1922,16 +1912,16 @@ function startMap() {
 		soundPlaying = true
 	}
 
+	createWorld()
+	loop()
+
 	ui.informNextLevel(1)
 	game.paused = false
-
 }
 
 
 
 function onWebsiteLoaded(event) {
-	ui = new UI(startMap)
-
 	// load audio
 	audioManager.load('ocean', null, '/audio/ocean.mp3')
 	audioManager.load('propeller', null, '/audio/propeller.mp3')
@@ -1966,24 +1956,10 @@ function onWebsiteLoaded(event) {
 	// load models
 	modelManager.load('heart')
 
-	// TODO: Start with loading screen
-
+	ui = new UI(startMap)
 	loadingProgressManager
 		.catch((err) => {
 			ui.showError(err.message)
-		})
-		.then(() => {
-			createWorld()
-			loop()
-
-			// {
-			// 	scene.remove(airplane.mesh)
-			// 	const [mesh, propeller, pilot] = createAirplane2Mesh()
-			// 	// mesh.rotation.y = Math.PI
-			// 	// mesh.scale.set(0.2, 0.2, 0.2)
-			// 	mesh.position.set(0, 100, 0)
-			// 	scene.add(mesh)
-			// }
 		})
 }
 
