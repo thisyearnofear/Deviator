@@ -2,7 +2,7 @@ import { utils } from "./utils/Utils";
 import { Colors } from "./utils/Colors";
 import Pilot from "./components/Pilot";
 
-export function createAirplaneMesh() {
+export function createAirplaneMesh(pilotType) {
   const mesh = new THREE.Object3D();
 
   // Cabin
@@ -204,7 +204,8 @@ export function createAirplaneMesh() {
   suspension.rotation.z = -0.3;
   mesh.add(suspension);
 
-  const pilot = new Pilot();
+  // Modify the pilot creation part
+  const pilot = new Pilot(pilotType);
   pilot.mesh.position.set(5, 27, 0);
   mesh.add(pilot.mesh);
 

@@ -4,6 +4,8 @@ import RainbowCloud from "./src/components/Cloud.js";
 import { audioManager } from "./src/managers/AudioManager.js";
 import { loadingProgressManager } from "./src/managers/loadingProgressManager.js";
 import { modelManager } from "./src/managers/ModelManager.js";
+import { selectionManager } from "./src/managers/SelectionManager.js";
+
 import {
   Colors,
   COLOR_COINS,
@@ -330,8 +332,7 @@ class BetterGun {
 }
 
 class Airplane {
-  constructor() {
-    const [mesh, propeller, pilot] = createAirplaneMesh();
+  constructor(mesh, propeller, pilot) {
     this.mesh = mesh;
     this.propeller = propeller;
     this.pilot = pilot;
@@ -954,7 +955,9 @@ let sea, sea2;
 let airplane;
 
 function createPlane() {
-  airplane = new Airplane();
+  const selectedPilot = selectionManager.getSelection();
+  const [mesh, propeller, pilot] = createAirplaneMesh(selectedPilot);
+  airplane = new Airplane(mesh, propeller, pilot);
   airplane.mesh.scale.set(0.25, 0.25, 0.25);
   airplane.mesh.position.y = world.planeDefaultHeight;
   scene.add(airplane.mesh);
@@ -1555,7 +1558,16 @@ function onWebsiteLoaded(event) {
   // load models
   modelManager.load("heart");
 
-  ui = new UI(startMap);
+  ui = new UI(() => {
+    selectionManager.initSelectionScreen();
+  });
+
+  document.addEventListener("pilotSelectionComplete", (event) => {
+    const selectedPilot = event.detail.pilot;
+    console.log("Selected pilot:", selectedPilot);
+    startMap();
+  });
+
   loadingProgressManager.catch((err) => {
     ui.showError(err.message);
   });
