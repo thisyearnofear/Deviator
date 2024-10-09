@@ -955,9 +955,9 @@ let sea, sea2;
 let airplane;
 
 function createPlane() {
-  const selectedPilot = selectionManager.getSelection();
-  const [mesh, propeller, pilot] = createAirplaneMesh(selectedPilot);
-  airplane = new Airplane(mesh, propeller, pilot);
+  const { pilot, aircraft } = selectionManager.getSelection();
+  const [mesh, propeller, pilotMesh] = createAirplaneMesh(pilot, aircraft);
+  airplane = new Airplane(mesh, propeller, pilotMesh);
   airplane.mesh.scale.set(0.25, 0.25, 0.25);
   airplane.mesh.position.y = world.planeDefaultHeight;
   scene.add(airplane.mesh);
@@ -1359,7 +1359,7 @@ class UI {
 }
 let ui;
 
-function createWorld() {
+function createWorld(pilot, aircraft) {
   world = {
     initSpeed: 0.00035,
     incrementSpeedByTime: 0.0000025,
@@ -1412,7 +1412,7 @@ function createWorld() {
   createSea();
   createSky();
   createLights();
-  createPlane();
+  createPlane(pilot, aircraft);
 
   resetMap();
 }
@@ -1485,14 +1485,14 @@ function resetMap() {
 
 let soundPlaying = false;
 
-function startMap() {
+function startMap(pilot, aircraft) {
   if (!soundPlaying) {
     audioManager.play("propeller", { loop: true, volume: 1 });
     audioManager.play("ocean", { loop: true, volume: 1 });
     soundPlaying = true;
   }
 
-  createWorld();
+  createWorld(pilot, aircraft);
   loop();
 
   ui.informNextLevel(1);
@@ -1562,10 +1562,9 @@ function onWebsiteLoaded(event) {
     selectionManager.initSelectionScreen();
   });
 
-  document.addEventListener("pilotSelectionComplete", (event) => {
-    const selectedPilot = event.detail.pilot;
-    console.log("Selected pilot:", selectedPilot);
-    startMap();
+  document.addEventListener("selectionComplete", (event) => {
+    const { pilot, aircraft } = event.detail;
+    startMap(pilot, aircraft);
   });
 
   loadingProgressManager.catch((err) => {

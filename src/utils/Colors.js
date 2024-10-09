@@ -10,6 +10,8 @@ export const Colors = {
   yellow: 0xf4ce93,
   blue: 0x68c3c0,
   lightPurple: 0xc8a2c8,
+  green: 0x00ff00,
+  black: 0x000000,
 };
 
 // Named exports for specific game elements
