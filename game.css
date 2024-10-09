@@ -348,11 +348,15 @@ a:focus-visible {
 #selection-screen {
   padding: 1rem;
   overflow-y: auto; /* Allow scrolling if content overflows */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
 .selection-container {
   display: flex;
-  flex-direction: column;
   gap: 1rem;
   width: 100%;
   max-width: 800px;
@@ -360,11 +364,7 @@ a:focus-visible {
 }
 
 .selection-step {
-  width: 100%;
-}
-
-.selection-step.active {
-  display: block;
+  flex: 1;
 }
 
 .selection-options {
@@ -397,13 +397,32 @@ a:focus-visible {
 }
 
 .selection-emoji {
-  font-size: 2rem;
+  font-size: 2.5rem;
   margin-bottom: 0.25rem;
 }
 
 .selection-name {
   font-size: 0.8rem;
   text-align: center;
+}
+
+#start-game {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: var(--color-link);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+#start-game:hover {
+  background-color: var(--color-link-hover);
 }
 
 .selection-button {
@@ -442,24 +461,6 @@ a:focus-visible {
     padding: 0.8rem 1.5rem;
     font-size: 1rem;
   }
-}
-
-#start-game {
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
-  background-color: var(--color-link);
-  color: var(--color-bg);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#start-game:hover {
-  background-color: var(--color-link-hover);
 }
 
 #start-screen {
@@ -634,44 +635,5 @@ a:focus-visible {
   .header {
     display: flex;
     align-content: space-between;
-  }
-}
-
-@media (min-width: 768px) {
-  .selection-container {
-    flex-direction: row;
-  }
-
-  .selection-step {
-    flex: 1;
-  }
-
-  .selection-options {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  }
-
-  .selection-emoji {
-    font-size: 2.5rem;
-  }
-
-  .selection-name {
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 767px) {
-  #selection-screen h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  #selection-screen h3 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .selection-button {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
   }
 }

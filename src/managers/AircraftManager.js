@@ -2,9 +2,9 @@
 export class AircraftManager {
   constructor() {
     this.aircraftOptions = [
-      { id: "airplane", name: "Airplane", emoji: "✈️" },
+      { id: "airplane", name: "Prop Plane", emoji: "✈️" },
       { id: "blimp", name: "Blimp", emoji: "🎈" },
-      { id: "fighterJet", name: "Fighter Jet", emoji: "🛩️" },
+      { id: "fighterJet", name: "Jet", emoji: "🛩️" },
     ];
 
     this.selectedAircraft = "airplane"; // Default to airplane

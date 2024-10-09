@@ -71,6 +71,7 @@ function createScene() {
     antialias: true,
   });
   renderer.setSize(ui.width, ui.height);
+  // sourcery skip: simplify-ternary
   renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
 
   renderer.shadowMap.enabled = true;

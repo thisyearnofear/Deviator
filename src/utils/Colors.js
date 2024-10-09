@@ -12,6 +12,9 @@ export const Colors = {
   lightPurple: 0xc8a2c8,
   green: 0x00ff00,
   black: 0x000000,
+  lightGreen: 0x90ee90,
+  darkGreen: 0x006400,
+  gold: 0xffd700,
 };
 
 // Named exports for specific game elements

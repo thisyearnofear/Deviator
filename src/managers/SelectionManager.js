@@ -3,9 +3,9 @@ import { aircraftManager } from "./AircraftManager";
 export class SelectionManager {
   constructor() {
     this.pilotOptions = [
-      { id: "human", name: "dude", emoji: "👨‍✈️" },
-      { id: "frog", name: "pepe", emoji: "🐸" },
-      { id: "nouns", name: "noun", emoji: "😎" },
+      { id: "human", name: "jesse", emoji: "👨🏼‍🦰" },
+      { id: "frog", name: "degen", emoji: "🎩" },
+      { id: "nouns", name: "bald noun", emoji: "😎" },
     ];
 
     this.selectedPilot = null;

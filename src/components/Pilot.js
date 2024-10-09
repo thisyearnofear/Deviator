@@ -99,46 +99,238 @@ export default class Pilot {
   }
 
   createFrogPilot() {
+    // Body
     const bodyGeom = new THREE.SphereGeometry(7.5, 32, 32);
     const bodyMat = new THREE.MeshPhongMaterial({
-      color: Colors.green, // Make sure 'green' is defined in Colors
-      flatShading: true,
+      color: Colors.green,
+      flatShading: false,
+      shininess: 30,
     });
     const body = new THREE.Mesh(bodyGeom, bodyMat);
     this.mesh.add(body);
 
-    // Add eyes
+    // Add bump texture to the body
+    const textureLoader = new THREE.TextureLoader();
+    const bumpTexture = textureLoader.load("path/to/frog_skin_bump.png");
+    bodyMat.bumpMap = bumpTexture;
+    bodyMat.bumpScale = 0.5;
+
+    // Eyes
     const eyeGeom = new THREE.SphereGeometry(2, 32, 32);
     const eyeMat = new THREE.MeshPhongMaterial({
       color: Colors.white,
-      flatShading: true,
+      flatShading: false,
+      shininess: 100,
     });
     const eyeL = new THREE.Mesh(eyeGeom, eyeMat);
-    eyeL.position.set(3, 2, 4);
+    eyeL.position.set(3, 4, 4);
     const eyeR = eyeL.clone();
-    eyeR.position.set(3, 2, -4);
+    eyeR.position.set(3, 4, -4);
     this.mesh.add(eyeL);
     this.mesh.add(eyeR);
 
-    // Add pupils
+    // Pupils
     const pupilGeom = new THREE.SphereGeometry(1, 32, 32);
     const pupilMat = new THREE.MeshPhongMaterial({
-      color: Colors.black, // Make sure 'black' is defined in Colors
-      flatShading: true,
+      color: Colors.black,
+      flatShading: false,
+      shininess: 100,
     });
     const pupilL = new THREE.Mesh(pupilGeom, pupilMat);
-    pupilL.position.set(4, 2, 4);
+    pupilL.position.set(4, 4, 4);
     const pupilR = pupilL.clone();
-    pupilR.position.set(4, 2, -4);
+    pupilR.position.set(4, 4, -4);
     this.mesh.add(pupilL);
     this.mesh.add(pupilR);
 
-    // Add casino-themed top hat
-    const topHatGeometry = new THREE.CylinderGeometry(3, 3, 10, 32);
-    const topHatMaterial = new THREE.MeshPhongMaterial({ color: Colors.black });
+    // Mouth
+    const mouthShape = new THREE.Shape();
+    mouthShape.moveTo(-3, 0);
+    mouthShape.quadraticCurveTo(0, -2, 3, 0);
+    const mouthGeom = new THREE.ShapeGeometry(mouthShape);
+    const mouthMat = new THREE.MeshPhongMaterial({
+      color: Colors.darkGreen,
+      side: THREE.DoubleSide,
+    });
+    const mouth = new THREE.Mesh(mouthGeom, mouthMat);
+    mouth.position.set(3, -2, 0);
+    mouth.rotation.x = Math.PI * 0.5;
+    this.mesh.add(mouth);
+
+    // Tongue
+    const tongueGeom = new THREE.BoxGeometry(1, 0.5, 4);
+    const tongueMat = new THREE.MeshPhongMaterial({
+      color: Colors.red,
+      flatShading: false,
+    });
+    const tongue = new THREE.Mesh(tongueGeom, tongueMat);
+    tongue.position.set(3, -2, 2);
+    tongue.rotation.x = Math.PI * 0.25;
+    this.mesh.add(tongue);
+
+    // Webbed feet
+    const footShape = new THREE.Shape();
+    footShape.moveTo(-1.5, 0);
+    footShape.lineTo(-0.5, 2);
+    footShape.lineTo(0.5, 2);
+    footShape.lineTo(1.5, 0);
+    footShape.lineTo(-1.5, 0);
+    const footGeom = new THREE.ShapeGeometry(footShape);
+    const footMat = new THREE.MeshPhongMaterial({
+      color: Colors.darkGreen,
+      side: THREE.DoubleSide,
+      flatShading: false,
+    });
+
+    const positions = [
+      { x: -3, y: -7, z: 3 },
+      { x: 3, y: -7, z: 3 },
+      { x: -3, y: -7, z: -3 },
+      { x: 3, y: -7, z: -3 },
+    ];
+
+    positions.forEach((pos) => {
+      const foot = new THREE.Mesh(footGeom, footMat);
+      foot.position.set(pos.x, pos.y, pos.z);
+      foot.rotation.x = Math.PI * 0.5;
+      this.mesh.add(foot);
+    });
+
+    // Vocal sac
+    const vocalSacGeom = new THREE.SphereGeometry(
+      3,
+      32,
+      16,
+      0,
+      Math.PI * 2,
+      0,
+      Math.PI * 0.5
+    );
+    const vocalSacMat = new THREE.MeshPhongMaterial({
+      color: Colors.lightGreen,
+      flatShading: false,
+      transparent: true,
+      opacity: 0.7,
+    });
+    const vocalSac = new THREE.Mesh(vocalSacGeom, vocalSacMat);
+    vocalSac.position.set(0, -5, 6);
+    vocalSac.rotation.x = Math.PI;
+    this.mesh.add(vocalSac);
+
+    // Casino-themed oversized top hat
+    const hatGroup = new THREE.Group();
+
+    const topHatGeometry = new THREE.CylinderGeometry(6, 7, 12, 32);
+    const topHatMaterial = new THREE.MeshPhongMaterial({
+      color: Colors.black,
+      flatShading: true,
+    });
     const topHat = new THREE.Mesh(topHatGeometry, topHatMaterial);
-    topHat.position.set(0, 5, 0);
-    this.mesh.add(topHat);
+    topHat.position.set(0, 6, 0);
+    hatGroup.add(topHat);
+
+    // Hat band
+    const hatBandGeometry = new THREE.TorusGeometry(6.5, 1, 16, 100);
+    const hatBandMaterial = new THREE.MeshPhongMaterial({
+      color: Colors.gold,
+      flatShading: true,
+    });
+    const hatBand = new THREE.Mesh(hatBandGeometry, hatBandMaterial);
+    hatBand.position.set(0, 1, 0);
+    hatBand.rotation.x = Math.PI * 0.5;
+    hatGroup.add(hatBand);
+
+    // Playing card
+    const cardGeometry = new THREE.BoxGeometry(4, 6, 0.1);
+    const cardMaterial = new THREE.MeshPhongMaterial({
+      color: Colors.white,
+      flatShading: true,
+    });
+    const card = new THREE.Mesh(cardGeometry, cardMaterial);
+    card.position.set(4, 4, 0);
+    card.rotation.z = Math.PI / 12;
+    hatGroup.add(card);
+
+    // Card symbol (heart)
+    const heartShape = new THREE.Shape();
+    heartShape.moveTo(0, 0);
+    heartShape.bezierCurveTo(0, -1, -1, -1, -1, 0);
+    heartShape.bezierCurveTo(-1, 1, 0, 1, 0, 2);
+    heartShape.bezierCurveTo(0, 1, 1, 1, 1, 0);
+    heartShape.bezierCurveTo(1, -1, 0, -1, 0, 0);
+
+    const heartGeometry = new THREE.ShapeGeometry(heartShape);
+    const heartMaterial = new THREE.MeshPhongMaterial({
+      color: Colors.red,
+      flatShading: true,
+    });
+    const heartSymbol = new THREE.Mesh(heartGeometry, heartMaterial);
+    heartSymbol.scale.set(1, 1, 1);
+    heartSymbol.position.set(4, 4, 0.1);
+    hatGroup.add(heartSymbol);
+
+    hatGroup.position.set(0, 10, 0);
+    hatGroup.scale.set(1.5, 1.5, 1.5);
+    this.mesh.add(hatGroup);
+
+    // Bow tie
+    const bowTieGroup = new THREE.Group();
+    const bowGeometry = new THREE.BoxGeometry(3, 1, 0.5);
+    const bowMaterial = new THREE.MeshPhongMaterial({
+      color: Colors.red,
+      flatShading: true,
+    });
+    const bowLeft = new THREE.Mesh(bowGeometry, bowMaterial);
+    bowLeft.position.set(-1, 0, 0);
+    bowLeft.rotation.z = Math.PI / 6;
+    const bowRight = bowLeft.clone();
+    bowRight.position.set(1, 0, 0);
+    bowRight.rotation.z = -Math.PI / 6;
+    const bowCenter = new THREE.Mesh(
+      new THREE.BoxGeometry(0.5, 0.5, 0.5),
+      bowMaterial
+    );
+    bowTieGroup.add(bowLeft, bowRight, bowCenter);
+    bowTieGroup.position.set(3, -3, 6);
+    this.mesh.add(bowTieGroup);
+
+    // Spots
+    const spotGeometry = new THREE.CircleGeometry(0.3, 32);
+    const spotMaterial = new THREE.MeshPhongMaterial({
+      color: Colors.darkGreen,
+      flatShading: true,
+    });
+    for (let i = 0; i < 20; i++) {
+      const spot = new THREE.Mesh(spotGeometry, spotMaterial);
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.random() * Math.PI;
+      const x = 7.5 * Math.sin(phi) * Math.cos(theta);
+      const y = 7.5 * Math.sin(phi) * Math.sin(theta);
+      const z = 7.5 * Math.cos(phi);
+      spot.position.set(x, y, z);
+      spot.lookAt(0, 0, 0);
+      this.mesh.add(spot);
+    }
+
+    // Legs
+    const legGeometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 32);
+    const legMaterial = new THREE.MeshPhongMaterial({
+      color: Colors.green,
+      flatShading: true,
+    });
+
+    // Feet
+    const footGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+    const footMaterial = new THREE.MeshPhongMaterial({
+      color: Colors.darkGreen,
+      flatShading: true,
+    });
+    positions.forEach((pos) => {
+      const foot = new THREE.Mesh(footGeometry, footMaterial);
+      foot.position.set(pos.x, pos.y - 1.5, pos.z);
+      foot.scale.set(1, 0.5, 1.5);
+      this.mesh.add(foot);
+    });
   }
 
   createNounsPilot() {
