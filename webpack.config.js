@@ -27,4 +27,11 @@ module.exports = {
     compress: true,
     port: 8080,
   },
+  resolve: {
+    extensions: [".js", ".jsx", ".json"],
+    alias: {
+      "@": path.resolve(__dirname, "src/"),
+      "@managers": path.resolve(__dirname, "src/managers/"),
+    },
+  },
 };
