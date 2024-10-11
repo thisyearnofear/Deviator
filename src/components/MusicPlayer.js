@@ -3,7 +3,7 @@ class MusicPlayer {
     this.isMinimized = false;
     this.playerElement = document.createElement("div");
     this.buttonElement = document.createElement("button");
-    this.trackUrl = "https://futuretape.xyz/embed/search/will%20juergens";
+    this.baseTrackUrl = "https://futuretape.xyz/embed/search/will%20juergens";
     this.init();
   }
 
@@ -11,7 +11,7 @@ class MusicPlayer {
     // Set up player element
     this.playerElement.id = "music-player";
     this.playerElement.className = "expanded";
-    this.loadTrack(this.trackUrl);
+    this.loadRandomTrack();
 
     // Set up toggle button
     this.buttonElement.id = "toggle-music-player";
@@ -26,10 +26,12 @@ class MusicPlayer {
     this.attemptAutoplay();
   }
 
-  loadTrack(trackUrl) {
+  loadRandomTrack() {
+    const randomTrack = Math.floor(Math.random() * 6) + 1; // Assuming there are at least 100 tracks
+    const trackUrl = `${this.baseTrackUrl}?start=${randomTrack}&autoplay=1`;
     this.playerElement.innerHTML = `
       <iframe
-        src="${trackUrl}?autoplay=1"
+        src="${trackUrl}"
         width="100%"
         height="100"
         frameBorder="0"

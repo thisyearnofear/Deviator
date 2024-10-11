@@ -99,48 +99,68 @@ export default class Pilot {
   }
 
   createFrogPilot() {
-    // Body
+    // Helper function to randomize vertices for a bumpy effect
+    function addBumpEffect(geometry, bumpStrength) {
+      const vertices = geometry.attributes.position.array;
+      for (let i = 0; i < vertices.length; i += 3) {
+        const offset = (Math.random() - 0.5) * bumpStrength;
+        vertices[i] += offset; // x-coordinate
+        vertices[i + 1] += offset; // y-coordinate
+        vertices[i + 2] += offset; // z-coordinate
+      }
+      geometry.attributes.position.needsUpdate = true;
+      geometry.computeVertexNormals();
+    }
+
+    // Body geometry with a bumpy surface
     const bodyGeom = new THREE.SphereGeometry(7.5, 32, 32);
+    addBumpEffect(bodyGeom, 0.2); // Add bumpiness to the body geometry
+
+    // Material for the body
     const bodyMat = new THREE.MeshPhongMaterial({
       color: Colors.green,
       flatShading: false,
       shininess: 30,
     });
+
+    // Body mesh
     const body = new THREE.Mesh(bodyGeom, bodyMat);
     this.mesh.add(body);
 
-    // Add bump texture to the body
-    const textureLoader = new THREE.TextureLoader();
-    const bumpTexture = textureLoader.load("path/to/frog_skin_bump.png");
-    bodyMat.bumpMap = bumpTexture;
-    bodyMat.bumpScale = 0.5;
-
-    // Eyes
+    // Eyes geometry and material
     const eyeGeom = new THREE.SphereGeometry(2, 32, 32);
     const eyeMat = new THREE.MeshPhongMaterial({
       color: Colors.white,
       flatShading: false,
       shininess: 100,
     });
+
+    // Left eye
     const eyeL = new THREE.Mesh(eyeGeom, eyeMat);
     eyeL.position.set(3, 4, 4);
+    this.mesh.add(eyeL);
+
+    // Right eye (clone of the left eye)
     const eyeR = eyeL.clone();
     eyeR.position.set(3, 4, -4);
-    this.mesh.add(eyeL);
     this.mesh.add(eyeR);
 
-    // Pupils
+    // Pupils geometry and material
     const pupilGeom = new THREE.SphereGeometry(1, 32, 32);
     const pupilMat = new THREE.MeshPhongMaterial({
       color: Colors.black,
       flatShading: false,
       shininess: 100,
     });
+
+    // Left pupil
     const pupilL = new THREE.Mesh(pupilGeom, pupilMat);
     pupilL.position.set(4, 4, 4);
+    this.mesh.add(pupilL);
+
+    // Right pupil (clone of the left pupil)
     const pupilR = pupilL.clone();
     pupilR.position.set(4, 4, -4);
-    this.mesh.add(pupilL);
     this.mesh.add(pupilR);
 
     // Mouth

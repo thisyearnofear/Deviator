@@ -6,7 +6,7 @@
 
 :root {
   font-size: 13px;
-  --color-bg-light: #1a2b4e; /* New lighter blue background color */
+  --color-bg-light: #1a2b4e;
   --color-tooltip-bg: rgba(241, 215, 150, 0.9); /* Softer tooltip background */
   --color-tooltip-text: #101558; /* Tooltip text color */
   --color-highlight-border: #b19cd9; /* Soft light purple for border highlight */
@@ -203,6 +203,8 @@ a:focus-visible {
   transition: all 0.5s ease-in-out;
   opacity: 0;
   transform: translateY(-20px);
+  font-size: 10rem !important;
+  font-size: ini;
 }
 
 .score-wrapper.visible {
@@ -287,6 +289,7 @@ a:focus-visible {
 
 .score__value--level {
   font-size: 1.5rem;
+  margin-right: 0.5rem;
 }
 
 .score__value--dist {
@@ -587,27 +590,6 @@ a:focus-visible {
   cursor: not-allowed;
 }
 
-@media (max-width: 600px) {
-  .selection-container {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .selection-option {
-    width: 50px;
-    height: 50px;
-  }
-
-  .selection-emoji {
-    font-size: 1.2rem;
-  }
-
-  #start-game {
-    padding: 0.6rem 1.2rem;
-    font-size: 1rem;
-  }
-}
-
 #start-screen {
   position: fixed;
   left: 0;
@@ -642,6 +624,32 @@ a:focus-visible {
   width: 200px;
   height: 60px;
   font-size: 40px;
+}
+
+.stay-based-button {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #3498db; /* Primary blue color */
+  color: #ffffff; /* White text */
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stay-based-button:hover {
+  background-color: #2980b9; /* Darker blue on hover */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.stay-based-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 #score-screen {
@@ -775,21 +783,6 @@ a:focus-visible {
   }
 }
 
-@media screen and (min-width: 53em) {
-  :root {
-    font-size: 22px;
-  }
-  .header {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .header__title-wrap {
-    margin-bottom: 16%;
-  }
-}
-
 .tooltip {
   display: none;
   position: fixed;
@@ -829,4 +822,257 @@ a:focus-visible {
   margin-right: 6px;
   font-size: 16px;
   vertical-align: middle;
+}
+
+/* Wallet connect container */
+#wallet-connect-container {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  text-align: center;
+}
+
+/* Connect Wallet Button Styling */
+#connect-wallet {
+  background-color: #4f46e5; /* Updated to a more modern indigo */
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#connect-wallet:hover {
+  background-color: #4338ca;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#connect-wallet:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.5);
+}
+
+#connect-wallet:active {
+  transform: translateY(0);
+}
+
+/* Wallet info box */
+.wallet-info {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+  padding: 0.5rem;
+  background-color: #f3f4f6;
+  border-radius: 0.375rem;
+  display: inline-block;
+}
+
+/* Modal styling */
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 1001; /* Ensure it's above the button */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  width: 90%;
+  max-width: 28rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.modal.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+.modal-content p {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+}
+
+/* Close modal button */
+.close-button {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  background-color: #dc2626;
+}
+
+.close-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.5);
+}
+
+/* Hidden class to hide elements */
+.hidden {
+  display: none !important;
+}
+
+/* Styles for Web3Modal */
+#w3m-modal {
+  z-index: 1002; /* Ensure it's above everything else */
+}
+
+/* Media query for widths between 848px and 1200px */
+@media (max-width: 1200px) and (min-width: 849px) {
+  #intro-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .score-wrapper {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    transition: all 0.5s ease-in-out;
+    opacity: 0;
+    transform: translateY(-20px);
+    font-size: 1.2rem;
+  }
+
+  #selection-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    margin-top: 150;
+  }
+
+  .header__title-wrap {
+    margin-bottom: 4rem; /* Increase space below the title */
+  }
+
+  .selection-container {
+    flex-direction: row;
+    gap: 1rem;
+    margin: 4rem 0 2rem 0; /* Adjust margins for better spacing */
+  }
+}
+
+/* Media query for widths below 848px */
+@media (max-width: 848px) {
+  #intro-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Align items towards the top */
+    padding: 2rem;
+  }
+
+  .header__title-wrap {
+    margin-bottom: 2rem; /* Adjust space below the title */
+    text-align: center;
+  }
+
+  .header__title-main {
+    font-size: 2.5rem; /* Adjust title size for smaller screens */
+  }
+
+  .selection-container {
+    flex-direction: column; /* Stack options vertically */
+    gap: 1rem;
+    margin: 2rem 0; /* Adjust margins for better spacing */
+  }
+
+  #start-game {
+    margin-top: -15rem; /* Add space above the start button */
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  #connect-wallet {
+    width: auto; /* Allow button to size based on content */
+    max-width: 90%; /* Prevent it from being too wide on small screens */
+  }
+
+  .modal-content {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .selection-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .selection-option {
+    width: 50px;
+    height: 50px;
+  }
+
+  .selection-emoji {
+    font-size: 1.2rem;
+  }
+
+  #start-game {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+  }
+}
+
+@media screen and (min-width: 53em) {
+  :root {
+    font-size: 22px;
+  }
+  .header {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .header__title-wrap {
+    margin-bottom: 16%;
+  }
 }

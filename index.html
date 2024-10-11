@@ -19,7 +19,13 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.139.2/examples/js/loaders/OBJLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.139.2/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"></script>
-  </head>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+  <script type="module" src="src/components/WalletConnect.js"></script>
+   </head>
+
+</head>
   <body>
     <div id="game-container"></div>
     <div class="game-holder" id="gameHolder">
@@ -44,6 +50,23 @@
             <a href="https://baseworld.org" class="hover-line">WORLD</a>
           </h2>
         </div>
+      </div>
+
+      <div id="wallet-connect-container">
+        <button id="connect-wallet" class="wallet-button">Connect Wallet</button>
+        <div id="wallet-info" class="wallet-info hidden">
+            <span id="wallet-address"></span>
+        </div>
+    </div>
+    <div id="wallet-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Wallet Not Detected</h2>
+            <p>No Ethereum wallet was detected. Please install MetaMask or another Web3 wallet to connect.</p>
+            <button id="close-modal" class="close-button">Close</button>
+        </div>
+    </div>
+
+
         <div id="score-wrapper" class="score-wrapper hidden">
           <div class="score" id="score">
             <div class="score__content" id="level">
@@ -164,7 +187,9 @@
           </div>
         </div>
         <br />
-        Stay Based
+        <a href="https://zora.co/collect/zora:0x4a57b15e45d03bd85c8ee38dcff9e2bf0e87dbcf/1?referrer=0x55A5705453Ee82c742274154136Fce8149597058" id="stay-based-button" class="stay-based-button" target="_blank" rel="noopener noreferrer">
+          Stay Based
+        </a>
       </div>
     </div>
 
@@ -206,12 +231,14 @@
         Attribution 3.0<br />
       </p>
     </div>
+  
     <script type="module">
       import MusicPlayer from "./src/components/MusicPlayer.js";
 
       // Initialize the music player
       const musicPlayer = new MusicPlayer();
     </script>
-    <script type="text/javascript" src="dist/bundle.js"></script>
+
+    <script src="dist/bundle.js" defer></script>
   </body>
 </html>
