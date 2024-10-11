@@ -6,6 +6,13 @@ module.exports = {
     filename: "bundle.js",
     path: path.resolve(__dirname, "dist"),
   },
+  resolve: {
+    extensions: [".js"],
+    alias: {
+      "@": path.resolve(__dirname, "src/"),
+      "@managers": path.resolve(__dirname, "src/managers/"),
+    },
+  },
   module: {
     rules: [
       {
@@ -19,19 +26,5 @@ module.exports = {
         },
       },
     ],
-  },
-  devServer: {
-    static: {
-      directory: path.join(__dirname, "/"),
-    },
-    compress: true,
-    port: 8080,
-  },
-  resolve: {
-    extensions: [".js", ".jsx", ".json"],
-    alias: {
-      "@": path.resolve(__dirname, "src/"),
-      "@managers": path.resolve(__dirname, "src/managers/"),
-    },
   },
 };

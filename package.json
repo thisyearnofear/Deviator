@@ -1,21 +1,17 @@
 {
   "name": "the-base-globe",
   "version": "1.0.0",
-  "description": "The Base Globe game",
+  "private": true,
   "scripts": {
-    "start": "webpack serve --mode development",
-    "build": "webpack --mode production"
-  },
-  "dependencies": {
-    "three": "^0.139.2",
-    "web3": "^1.7.0"
+    "build": "webpack --mode production",
+    "dev": "webpack serve --mode development"
   },
   "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
+    "babel-loader": "^8.2.5",
     "webpack": "^5.75.0",
     "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.11.1",
-    "babel-loader": "^8.2.5",
-    "@babel/core": "^7.20.12",
-    "@babel/preset-env": "^7.20.2"
+    "webpack-dev-server": "^4.11.1"
   }
 }
