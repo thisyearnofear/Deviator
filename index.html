@@ -3,16 +3,10 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>The Aviator 2</title>
-    <meta
-      name="description"
-      content="An extension of Karim Maaloul's game The Aviator."
-    />
-    <meta
-      name="keywords"
-      content="three.js, game, aviator, browser, javascript"
-    />
-    <meta name="author" content="Michel Helms for Codrops" />
+    <title>The Base Globe</title>
+    <meta name="description" content="Being BASED around the WORLD" />
+    <meta name="keywords" content="three.js, game, browser, javascript" />
+    <meta name="author" content="papa" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -33,73 +27,77 @@
         <div class="header__title-wrap">
           <h1 class="header__title">
             <span class="header__title-pre">The</span>
-            <span class="header__title-main">BaseGlobe</span>
+            <span class="header__title-main">
+              <span class="letter">B</span>
+              <span class="letter">a</span>
+              <span class="letter">s</span>
+              <span class="letter">e</span>
+              <span class="globe-emoji">🌎</span>
+              <span class="letter">l</span>
+              <span class="letter">o</span>
+              <span class="letter">b</span>
+              <span class="letter">e</span>
+            </span>
           </h1>
           <h2 class="header__tagline">
-            BASED on Karim & Michel's
-            <a href="http://tympanus.net/codrops/?p=26501" class="hover-line"
-              >The Aviator</a
-            >
+            BASED around the
+            <a href="https://baseworld.org" class="hover-line">WORLD</a>
           </h2>
         </div>
-        <div class="score" id="score">
-          <div class="score__content" id="level">
-            <div class="score__label">level</div>
-            <div class="score__value score__value--level" id="levelValue">
-              1
+        <div id="score-wrapper" class="score-wrapper hidden">
+          <div class="score" id="score">
+            <div class="score__content" id="level">
+              <div class="score__label">level</div>
+              <div class="score__value score__value--level" id="levelValue">
+                1
+              </div>
+              <svg class="level-circle" id="levelCircle" viewbox="0 0 200 200">
+                <circle
+                  id="levelCircleBgr"
+                  r="80"
+                  cx="100"
+                  cy="100"
+                  fill="none"
+                  stroke="#d1b790"
+                  stroke-width="24px"
+                />
+                <circle
+                  id="levelCircleStroke"
+                  r="80"
+                  cx="100"
+                  cy="100"
+                  fill="none"
+                  #f25346
+                  stroke="#68c3c0"
+                  stroke-width="14px"
+                  stroke-dasharray="502"
+                />
+              </svg>
             </div>
-            <svg class="level-circle" id="levelCircle" viewbox="0 0 200 200">
-              <circle
-                id="levelCircleBgr"
-                r="80"
-                cx="100"
-                cy="100"
-                fill="none"
-                stroke="#d1b790"
-                stroke-width="24px"
-              />
-              <circle
-                id="levelCircleStroke"
-                r="80"
-                cx="100"
-                cy="100"
-                fill="none"
-                #f25346
-                stroke="#68c3c0"
-                stroke-width="14px"
-                stroke-dasharray="502"
-              />
-            </svg>
-          </div>
-          <div class="score__content score__content--fixed" id="dist">
-            <div class="score__label">distance</div>
-            <div class="score__value score__value--dist" id="distValue">0</div>
-          </div>
-          <div class="score__content score__content--fixed" id="coins">
-            <div class="score__label">coins</div>
-            <div class="score__value score__value--dist" id="coinsValue">0</div>
-          </div>
-          <div class="score__content" id="lifes">
-            <div class="score__label">life</div>
-            <img class="heart" src="heart.png" />
-            <img class="heart" src="heart.png" />
-            <img class="heart" src="heart.png" />
+            <div class="score__content score__content--fixed" id="dist">
+              <div class="score__label">distance</div>
+              <div class="score__value score__value--dist" id="distValue">
+                0
+              </div>
+            </div>
+            <div class="score__content score__content--fixed" id="coins">
+              <div class="score__label">coins</div>
+              <div class="score__value score__value--dist" id="coinsValue">
+                0
+              </div>
+            </div>
+            <div class="score__content" id="lifes">
+              <div class="score__label">life</div>
+              <img class="heart" src="heart.png" />
+              <img class="heart" src="heart.png" />
+              <img class="heart" src="heart.png" />
+            </div>
           </div>
         </div>
       </div>
 
       <nav class="links">
-        <a
-          href="https://tympanus.net/Tutorials/TheAviator/index.html"
-          class="hover-line"
-          >Karim's Original</a
-        >
-        <a href="https://tympanus.net/Tutorials/TheAviator2/" class="hover-line"
-          >Michel's Upgrade</a
-        >
-        <a href="https://warpcast.com/papa" class="hover-line"
-          >(Re)Built by Papa</a
-        >
+        <a href="https://warpcast.com/papa" class="hover-line">Papa</a>
       </nav>
 
       <div class="world" id="world">
@@ -133,11 +131,10 @@
             </div>
           </div>
           <button id="start-game" class="selection-button" disabled>
-            Start Game
+            Start
           </button>
         </div>
       </div>
-
       <div id="score-screen">
         <div>
           <p class="headline">Map complete</p>
@@ -167,7 +164,7 @@
           </div>
         </div>
         <br />
-        Thanks for playing!
+        Stay Based
       </div>
     </div>
 

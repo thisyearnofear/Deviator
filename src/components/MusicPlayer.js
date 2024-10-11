@@ -3,25 +3,26 @@ class MusicPlayer {
     this.isMinimized = false;
     this.playerElement = document.createElement("div");
     this.buttonElement = document.createElement("button");
-    this.tracks = ["https://futuretape.xyz/embed/search/will%20juergens"];
-    this.trackDurations = [180, 240]; // Example durations in seconds
-    this.currentTrackIndex = 0;
-    this.trackDuration = this.trackDurations[this.currentTrackIndex];
-    this.checkInterval = null;
+    this.trackUrl = "https://futuretape.xyz/embed/search/will%20juergens";
     this.init();
   }
 
   init() {
+    // Set up player element
     this.playerElement.id = "music-player";
     this.playerElement.className = "expanded";
-    this.loadTrack(this.tracks[this.currentTrackIndex]);
+    this.loadTrack(this.trackUrl);
 
+    // Set up toggle button
     this.buttonElement.id = "toggle-music-player";
     this.buttonElement.textContent = "▼";
     this.buttonElement.addEventListener("click", () => this.togglePlayer());
 
+    // Append elements to the body
     document.body.appendChild(this.playerElement);
     document.body.appendChild(this.buttonElement);
+
+    // Autoplay on page load
     this.attemptAutoplay();
   }
 
@@ -36,21 +37,6 @@ class MusicPlayer {
         loading="lazy"
       ></iframe>
     `;
-    this.trackDuration = this.trackDurations[this.currentTrackIndex];
-    this.startTrackCheck();
-    this.preloadNextTrack(); // Preload the next track
-  }
-
-  startTrackCheck() {
-    if (this.checkInterval) {
-      clearInterval(this.checkInterval);
-    }
-    this.checkInterval = setInterval(() => {
-      this.trackDuration--;
-      if (this.trackDuration <= 0) {
-        this.nextTrack();
-      }
-    }, 1000);
   }
 
   togglePlayer() {
@@ -62,22 +48,8 @@ class MusicPlayer {
   attemptAutoplay() {
     const iframe = this.playerElement.querySelector("iframe");
     if (iframe) {
-      iframe.src += "";
+      iframe.src += ""; // Just triggers the autoplay
     }
-  }
-
-  nextTrack() {
-    this.currentTrackIndex = (this.currentTrackIndex + 1) % this.tracks.length;
-    this.loadTrack(this.tracks[this.currentTrackIndex]);
-  }
-
-  preloadNextTrack() {
-    const nextTrackIndex = (this.currentTrackIndex + 1) % this.tracks.length;
-    const nextTrackUrl = this.tracks[nextTrackIndex];
-    const iframe = document.createElement("iframe");
-    iframe.src = nextTrackUrl;
-    iframe.style.display = "none";
-    document.body.appendChild(iframe);
   }
 }
 

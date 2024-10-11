@@ -3,19 +3,24 @@ import { aircraftManager } from "./AircraftManager";
 export class SelectionManager {
   constructor() {
     this.pilotOptions = [
-      { id: "human", name: "jesse", emoji: "👨🏼‍🦰" },
-      { id: "frog", name: "degen", emoji: "🎩" },
-      { id: "nouns", name: "bald noun", emoji: "😎" },
+      { id: "human", emoji: "👨🏼‍🦰" },
+      { id: "frog", emoji: "🎩" },
+      { id: "nouns", emoji: "😎" },
     ];
 
     this.selectedPilot = null;
     this.selectedAircraft = null;
 
+    this.startButton = null;
+    this.startButtonTooltip = null;
+
     document.addEventListener("DOMContentLoaded", () => {
       this.initSelectionScreen();
-      document
-        .getElementById("start-game")
-        .addEventListener("click", () => this.startMap());
+      this.startButton = document.getElementById("start-game");
+      this.startButtonTooltip = document.getElementById("start-game-tooltip");
+      this.startButton.addEventListener("click", () => this.handleStartClick());
+      this.startButton.addEventListener("mouseenter", () => this.showTooltip());
+      this.startButton.addEventListener("mouseleave", () => this.hideTooltip());
     });
   }
 
@@ -86,8 +91,52 @@ export class SelectionManager {
   }
 
   updateStartButton() {
-    const startButton = document.getElementById("start-game");
-    startButton.disabled = !(this.selectedPilot && this.selectedAircraft);
+    if (!this.startButton) return;
+
+    const isSelectionComplete = this.selectedPilot && this.selectedAircraft;
+
+    if (isSelectionComplete) {
+      this.startButton.classList.add("visible");
+      this.startButton.disabled = false;
+    } else {
+      this.startButton.classList.remove("visible");
+      this.startButton.disabled = true;
+    }
+  }
+
+  handleStartClick() {
+    if (this.startButton.disabled) {
+      this.showTooltip();
+      setTimeout(() => this.hideTooltip(), 2000); // Hide after 2 seconds
+    } else {
+      this.startMap();
+    }
+  }
+
+  showTooltip() {
+    if (this.startButton.disabled && this.startButtonTooltip) {
+      this.startButtonTooltip.style.display = "block";
+      this.startButtonTooltip.classList.add("visible");
+      // Position the tooltip below the button
+      const buttonRect = this.startButton.getBoundingClientRect();
+      this.startButtonTooltip.style.top = `${buttonRect.bottom + 10}px`;
+      this.startButtonTooltip.style.left = `${
+        buttonRect.left + buttonRect.width / 2
+      }px`;
+      // Trigger reflow to ensure the transition works
+      this.startButtonTooltip.offsetHeight;
+      this.startButtonTooltip.style.opacity = "1";
+    }
+  }
+
+  hideTooltip() {
+    if (this.startButtonTooltip) {
+      this.startButtonTooltip.style.opacity = "0";
+      setTimeout(() => {
+        this.startButtonTooltip.classList.remove("visible");
+        this.startButtonTooltip.style.display = "none";
+      }, 300); // Match this with the transition duration in CSS
+    }
   }
 
   startMap() {
@@ -104,7 +153,22 @@ export class SelectionManager {
       "and aircraft:",
       this.selectedAircraft
     );
-    document.getElementById("intro-screen").classList.remove("visible");
+
+    // Add 'hidden' class to intro-screen
+    document.getElementById("intro-screen").classList.add("hidden");
+
+    // Add 'game-started' class to header
+    document.querySelector(".header").classList.add("game-started");
+
+    // Show score wrapper
+    const scoreWrapper = document.getElementById("score-wrapper");
+    scoreWrapper.classList.remove("hidden");
+
+    // Use a small delay to ensure the transition is visible
+    setTimeout(() => {
+      scoreWrapper.classList.add("visible");
+    }, 50);
+
     const event = new CustomEvent("selectionComplete", {
       detail: {
         pilot: this.selectedPilot,
