@@ -1,11 +1,16 @@
 import { aircraftManager } from "./AircraftManager";
+import {
+  checkERC1155Balance,
+  connectWallet,
+  getUserAddress,
+} from "../components/WalletConnect";
 
 export class SelectionManager {
   constructor() {
     this.pilotOptions = [
-      { id: "human", emoji: "👨🏼‍🦰" },
-      { id: "frog", emoji: "🎩" },
-      { id: "nouns", emoji: "😎" },
+      { id: "human", emoji: "👨🏼‍🦰", name: "Human" },
+      { id: "frog", emoji: "🎩", name: "Frog" },
+      { id: "nouns", emoji: "😎", name: "Nouns", tokenRequired: true },
     ];
 
     this.selectedPilot = null;
@@ -13,6 +18,9 @@ export class SelectionManager {
 
     this.startButton = null;
     this.startButtonTooltip = null;
+
+    this.userAddress = null;
+    this.hasToken = false;
 
     document.addEventListener("DOMContentLoaded", () => {
       this.initSelectionScreen();
@@ -24,7 +32,7 @@ export class SelectionManager {
     });
   }
 
-  initSelectionScreen() {
+  async initSelectionScreen() {
     const pilotOptionsContainer = document.getElementById("pilot-options");
     const aircraftOptionsContainer =
       document.getElementById("aircraft-options");
@@ -34,13 +42,29 @@ export class SelectionManager {
       return;
     }
 
+    try {
+      const result = await connectWallet();
+      this.userAddress = result.userAddress;
+      this.hasToken = result.hasToken;
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+      this.userAddress = null;
+      this.hasToken = false;
+    }
+
     this.pilotOptions.forEach((pilot) => {
       const option = this.createSelectionOption(pilot, "pilot");
+      if (pilot.tokenRequired) {
+        option.classList.toggle("hidden", !this.hasToken);
+      }
       pilotOptionsContainer.appendChild(option);
     });
 
     aircraftManager.getAircraftOptions().forEach((aircraft) => {
       const option = this.createSelectionOption(aircraft, "aircraft");
+      if (aircraft.tokenRequired) {
+        option.classList.toggle("hidden", !this.hasToken);
+      }
       aircraftOptionsContainer.appendChild(option);
     });
 

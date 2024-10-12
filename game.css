@@ -523,6 +523,14 @@ a:focus-visible {
   animation: float 3s ease-in-out infinite;
 }
 
+.selection-option[data-token-required="true"] {
+  display: none;
+}
+
+.selection-option[data-token-required="true"].visible {
+  display: flex;
+}
+
 .selection-option:hover {
   background-color: rgba(255, 255, 255, 0.2);
   transform: scale(1.05);

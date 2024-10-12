@@ -5,6 +5,7 @@ const CONFIG = {
     "https://sepolia.infura.io/v3/b52163bdfadb414386c2b1b84578a39b",
   baseRpcUrl:
     "https://base-sepolia.infura.io/v3/b52163bdfadb414386c2b1b84578a39b",
+  zoraRpcUrl: "https://rpc.zora.energy",
 };
 
 let web3;
@@ -83,7 +84,137 @@ async function updateConnectionState(isConnected, userAddress = null) {
   }
 }
 
-async function connectWallet() {
+const ERC1155_ABI = [
+  [
+    {
+      inputs: [
+        {
+          internalType: "address",
+          name: "_logic",
+          type: "address",
+        },
+      ],
+      stateMutability: "nonpayable",
+      type: "constructor",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: "address",
+          name: "previousAdmin",
+          type: "address",
+        },
+        {
+          indexed: false,
+          internalType: "address",
+          name: "newAdmin",
+          type: "address",
+        },
+      ],
+      name: "AdminChanged",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "beacon",
+          type: "address",
+        },
+      ],
+      name: "BeaconUpgraded",
+      type: "event",
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: "address",
+          name: "implementation",
+          type: "address",
+        },
+      ],
+      name: "Upgraded",
+      type: "event",
+    },
+    {
+      stateMutability: "payable",
+      type: "fallback",
+    },
+    {
+      stateMutability: "payable",
+      type: "receive",
+    },
+  ],
+];
+
+const ERC1155_CONTRACT_ADDRESS = "0x4a57b15E45d03bd85c8eE38dcFF9E2BF0e87dBCf";
+const TOKEN_ID = 1; // Adjust this if you're looking for a specific token ID
+
+export async function checkERC1155Balance(userAddress) {
+  if (!userAddress) {
+    console.error("No user address provided to checkERC1155Balance");
+    return false;
+  }
+
+  const networks = [
+    { name: "Base", rpcUrl: CONFIG.baseRpcUrl },
+    { name: "Zora", rpcUrl: CONFIG.zoraRpcUrl },
+  ];
+
+  for (const network of networks) {
+    try {
+      const web3 = new Web3(network.rpcUrl);
+
+      // Function signature for balanceOf(address,uint256)
+      const functionSignature = "0x00fdd58e";
+
+      // Encode function parameters
+      const params = web3.eth.abi.encodeParameters(
+        ["address", "uint256"],
+        [userAddress, TOKEN_ID]
+      );
+
+      // Combine function signature and encoded parameters
+      const data = functionSignature + params.slice(2);
+
+      const result = await web3.eth.call({
+        to: ERC1155_CONTRACT_ADDRESS,
+        data: data,
+      });
+
+      const balance = web3.utils.hexToNumber(result);
+
+      console.log(
+        `ERC1155 Token Balance on ${network.name} for address ${userAddress}:`,
+        balance
+      );
+
+      if (balance > 0) {
+        console.log(`User owns the specified ERC1155 token on ${network.name}`);
+        return true;
+      } else {
+        console.log(
+          `User does not own the specified ERC1155 token on ${network.name}`
+        );
+      }
+    } catch (error) {
+      console.error(
+        `Error checking ERC1155 balance on ${network.name}:`,
+        error
+      );
+    }
+  }
+
+  return false;
+}
+
+export async function connectWallet() {
   try {
     if (typeof window.ethereum !== "undefined") {
       await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -91,6 +222,11 @@ async function connectWallet() {
       if (userAddress) {
         await getNetworkInfo();
         await updateConnectionState(true, userAddress);
+
+        // Check ERC1155 balance after successful connection
+        const hasToken = await checkERC1155Balance(userAddress);
+        console.log("User has the token:", hasToken);
+        return { userAddress, hasToken };
       } else {
         console.error("Failed to retrieve user address");
         updateConnectionState(false);
@@ -102,6 +238,7 @@ async function connectWallet() {
     console.error("Failed to connect:", error);
     updateConnectionState(false);
   }
+  return { userAddress: null, hasToken: false };
 }
 
 function showModal() {
@@ -157,5 +294,7 @@ async function initializeWalletConnect() {
     }
   }
 }
+
+export { initializeWalletConnect, getUserAddress, getEnsNameOrShortAddress };
 
 window.addEventListener("load", initializeWalletConnect);
