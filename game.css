@@ -720,6 +720,23 @@ a:focus-visible {
   padding-left: 50px;
 }
 
+.twitter-share-button {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #1da1f2;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+  margin-bottom: 10px;
+}
+
+.twitter-share-button:hover {
+  background-color: #0c85d0;
+}
+
 #intro-screen {
   display: grid;
   place-items: center;

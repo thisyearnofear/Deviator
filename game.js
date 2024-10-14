@@ -6,6 +6,7 @@ import { loadingProgressManager } from "./src/managers/loadingProgressManager.js
 import { modelManager } from "./src/managers/ModelManager.js";
 import { selectionManager } from "./src/managers/SelectionManager.js";
 import GameplaySnapshotManager from "./src/managers/GameplaySnapshotManager.js";
+import SocialShare from "./src/components/SocialShare.js";
 
 import {
   Colors,
@@ -1343,8 +1344,6 @@ class UI {
 
   showScoreScreen() {
     const elemScreen = document.getElementById("score-screen");
-
-    // make visible
     elemScreen.classList.add("visible");
 
     // Display the snapshot
@@ -1361,7 +1360,7 @@ class UI {
       snapshotContainer.style.display = "none";
     }
 
-    // fill in statistics
+    // Fill in statistics
     document.getElementById("score-coins-collected").innerText =
       game.statistics.coinsCollected;
     document.getElementById("score-coins-total").innerText =
@@ -1374,6 +1373,17 @@ class UI {
       game.statistics.shotsFired;
     document.getElementById("score-lifes-lost").innerText =
       game.statistics.lifesLost;
+
+    // Initialize and render the SocialShare component
+    const gameData = {
+      coinsCollected: game.statistics.coinsCollected,
+      enemiesKilled: game.statistics.enemiesKilled,
+      shotsFired: game.statistics.shotsFired,
+      lifesLost: game.statistics.lifesLost,
+    };
+
+    const socialShare = new SocialShare("social-share-container", gameData);
+    socialShare.render();
   }
 
   showError(message) {
