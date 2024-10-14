@@ -5,6 +5,7 @@ import { audioManager } from "./src/managers/AudioManager.js";
 import { loadingProgressManager } from "./src/managers/loadingProgressManager.js";
 import { modelManager } from "./src/managers/ModelManager.js";
 import { selectionManager } from "./src/managers/SelectionManager.js";
+import GameplaySnapshotManager from "./src/managers/GameplaySnapshotManager.js";
 
 import {
   Colors,
@@ -13,6 +14,7 @@ import {
 } from "./src/utils/Colors";
 
 let sky;
+let gameplaySnapshotManager;
 
 class SceneManager {
   constructor() {
@@ -69,6 +71,7 @@ function createScene() {
     canvas: ui.canvas,
     alpha: true,
     antialias: true,
+    preserveDrawingBuffer: true,
   });
   renderer.setSize(ui.width, ui.height);
   // sourcery skip: simplify-ternary
@@ -110,6 +113,12 @@ function createScene() {
   //controls.noPan = true
 
   // handleWindowResize()
+
+  gameplaySnapshotManager = new GameplaySnapshotManager(
+    renderer,
+    scene,
+    camera
+  );
 }
 
 // LIGHTS
@@ -452,6 +461,7 @@ class Airplane {
     game.planeCollisionSpeedY = (100 * diffPos.y) / d;
     ambientLight.intensity = 2;
     audioManager.play("airplane-crash");
+    gameplaySnapshotManager.checkGameEnd(game.status);
   }
 }
 
@@ -1070,6 +1080,9 @@ function loop() {
         game.status = "gameover";
       }
     }
+    if (gameplaySnapshotManager) {
+      gameplaySnapshotManager.checkAndCapture();
+    }
   } else if (game.status == "gameover") {
     game.speed *= 0.99;
     airplane.mesh.rotation.z +=
@@ -1086,6 +1099,8 @@ function loop() {
   } else if (game.status == "waitingReplay") {
     // nothing to do
   }
+
+  gameplaySnapshotManager.checkGameEnd(game.status);
 
   if (!game.paused) {
     airplane.tick(deltaTime);
@@ -1143,7 +1158,8 @@ function setFollowView() {
 }
 
 class UI {
-  constructor(onStart) {
+  constructor(onStart, gameplaySnapshotManager) {
+    this.gameplaySnapshotManager = gameplaySnapshotManager;
     this._elemDistanceCounter = document.getElementById("distValue");
     this._elemReplayMessage = document.getElementById("replayMessage");
     this._elemLevelCounter = document.getElementById("levelValue");
@@ -1253,30 +1269,23 @@ class UI {
 
     if (game && game.status == "waitingReplay") {
       resetMap();
-      ui.informNextLevel(1);
+      this.informNextLevel(1);
       game.paused = false;
       sea.updateColor();
       sea2.updateColor();
 
-      ui.updateDistanceDisplay();
-      ui.updateLevelCount();
-      ui.updateLifesDisplay();
-      ui.updateCoinsCount();
+      this.updateDistanceDisplay();
+      this.updateLevelCount();
+      this.updateLifesDisplay();
+      this.updateCoinsCount();
 
-      ui.hideReplay();
+      this.hideReplay();
     }
   }
 
   handleBlur(event) {
     this.mouseButtons = [false, false, false];
   }
-
-  // function handleTouchEnd(event) {
-  // 	if (game.status == "waitingReplay"){
-  // 		resetGame()
-  // 		ui.hideReplay()
-  // 	}
-  // }
 
   showReplay() {
     this._elemReplayMessage.style.display = "block";
@@ -1338,6 +1347,20 @@ class UI {
     // make visible
     elemScreen.classList.add("visible");
 
+    // Display the snapshot
+    const snapshot = gameplaySnapshotManager.getSnapshot();
+    const snapshotContainer = document.getElementById(
+      "gameplay-snapshot-container"
+    );
+    const snapshotImage = document.getElementById("gameplay-snapshot");
+
+    if (snapshot) {
+      snapshotImage.src = snapshot;
+      snapshotContainer.style.display = "block";
+    } else {
+      snapshotContainer.style.display = "none";
+    }
+
     // fill in statistics
     document.getElementById("score-coins-collected").innerText =
       game.statistics.coinsCollected;
@@ -1358,6 +1381,7 @@ class UI {
     document.getElementById("error-message").innerText = message;
   }
 }
+
 let ui;
 
 function createWorld(pilot, aircraft) {
@@ -1493,7 +1517,13 @@ function startMap(pilot, aircraft) {
     soundPlaying = true;
   }
 
+  createScene();
   createWorld(pilot, aircraft);
+
+  if (gameplaySnapshotManager) {
+    gameplaySnapshotManager.startCapture();
+  }
+
   loop();
 
   ui.informNextLevel(1);
@@ -1561,7 +1591,7 @@ function onWebsiteLoaded(event) {
 
   ui = new UI(() => {
     selectionManager.initSelectionScreen();
-  });
+  }, gameplaySnapshotManager);
 
   document.addEventListener("selectionComplete", (event) => {
     const { pilot, aircraft } = event.detail;

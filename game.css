@@ -966,6 +966,28 @@ a:focus-visible {
   z-index: 1002; /* Ensure it's above everything else */
 }
 
+#gameplay-snapshot-container {
+  margin-top: 20px;
+  text-align: center;
+  max-width: 300px; /* Adjust this value as needed */
+  width: 100%;
+  display: none;
+}
+
+#gameplay-snapshot-container p {
+  margin-bottom: 10px;
+  color: var(--color-text-title);
+  font-size: 1rem;
+}
+
+#gameplay-snapshot {
+  width: 100%;
+  aspect-ratio: 16 / 9; /* This creates a 16:9 aspect ratio */
+  object-fit: cover; /* This ensures the image covers the area without stretching */
+  border-radius: 8px; /* Rounded corners for the image */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
 /* Media query for widths between 848px and 1200px */
 @media (max-width: 1200px) and (min-width: 849px) {
   #intro-screen {
