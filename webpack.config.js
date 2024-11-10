@@ -7,7 +7,7 @@ module.exports = {
   mode: "production",
   entry: "./game.js",
   output: {
-    filename: "[name].[contenthash].js",
+    filename: "[name].js",
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
     clean: true,
@@ -26,24 +26,17 @@ module.exports = {
         },
       },
       {
-        test: /\.(png|jpg|jpeg|gif|svg)$/i,
+        test: /\.(mp3|wav)$/,
         type: "asset/resource",
         generator: {
-          filename: "assets/images/[hash][ext][query]",
+          filename: "assets/audio/[name][ext]",
         },
       },
       {
-        test: /\.(mp3|wav)$/i,
+        test: /\.(png|jpg|jpeg|gif)$/,
         type: "asset/resource",
         generator: {
-          filename: "assets/sounds/[hash][ext][query]",
-        },
-      },
-      {
-        test: /\.(glb|gltf)$/i,
-        type: "asset/resource",
-        generator: {
-          filename: "assets/models/[hash][ext][query]",
+          filename: "assets/images/[name][ext]",
         },
       },
     ],
@@ -62,12 +55,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "./index.html",
       filename: "index.html",
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeAttributeQuotes: true,
-      },
-      inject: true,
+      inject: false, // Don't auto-inject scripts
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -75,58 +63,36 @@ module.exports = {
           from: "public",
           to: ".",
           noErrorOnMissing: true,
-          globOptions: {
-            ignore: ["**/index.html"],
-          },
         },
         {
-          from: "models",
-          to: "assets/models",
-          noErrorOnMissing: true,
+          from: "*.css",
+          to: "[name][ext]",
         },
         {
-          from: "sounds",
-          to: "assets/sounds",
-          noErrorOnMissing: true,
+          from: "*.png",
+          to: "[name][ext]",
         },
         {
-          from: "textures",
-          to: "assets/textures",
+          from: "audio",
+          to: "assets/audio",
           noErrorOnMissing: true,
         },
       ],
     }),
   ],
   optimization: {
-    minimize: true,
-    runtimeChunk: "single",
     splitChunks: {
       chunks: "all",
-      maxInitialRequests: Infinity,
-      minSize: 0,
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name(module) {
-            const packageName = module.context.match(
-              /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-            )[1];
-            return `vendor.${packageName.replace("@", "")}`;
-          },
-        },
-      },
+      name: "vendors",
     },
+    runtimeChunk: "single",
   },
   performance: {
     hints: false,
-    maxEntrypointSize: 512000,
-    maxAssetSize: 512000,
   },
   externals: {
     three: "THREE",
     gsap: "gsap",
-    web3: "Web3",
     ethers: "ethers",
   },
-  devtool: "source-map",
 };
