@@ -18,10 +18,10 @@ export const Colors = {
 };
 
 // Named exports for specific game elements
-export const COLOR_COINS = 0xffd700;
+export const COLOR_COINS = 0xffff00; // Bright yellow
 export const COLOR_COLLECTIBLE_BUBBLE = {
-  color: 0xc8a2c8,
-  opacity: 0.6,
+  color: 0x0000ff,
+  opacity: 0.8,
 };
 export const COLOR_SEA_LEVEL = [
   0x68c3c0, // hsl(178deg 43% 59%)

@@ -26,8 +26,9 @@ class GameplaySnapshotManager {
   }
 
   captureSnapshot() {
-    this.snapshot =
-      "https://pbs.twimg.com/media/GcB2QbzaoAA9MiG?format=jpg&name=large";
+    this.renderer.render(this.scene, this.camera);
+    const dataURL = this.renderer.domElement.toDataURL("image/jpeg", 0.7);
+    this.snapshot = dataURL;
   }
 
   checkGameEnd(gameStatus) {

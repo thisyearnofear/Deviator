@@ -22,9 +22,8 @@ class SocialShare {
   async shareOnTwitter(event) {
     event.preventDefault();
     const text = this.generateShareText();
-    const imageUrl =
-      "https://pbs.twimg.com/media/GcB2QbzaoAA9MiG?format=jpg&name=large";
-    const url = "https://thebaseglobe.vercel.app";
+    const imageUrl = "https://pic.twitter.com/J2LyIkNC94";
+    const url = "https://thebaseglobe.netlify.app";
 
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       text
@@ -40,15 +39,14 @@ class SocialShare {
       lifesLost = 0,
     } = this.gameData;
     return `Base Around The Globe 🌎 
-    #standwithcrypto $byegary
-  https://thebaseglobe.vercel.app
-  
-  Coins: ${coinsCollected}
-  Gary's ByeBye'd 👋: ${enemiesKilled}
-  Shots Fired: ${shotsFired}
-  Damage Taken: ${lifesLost}
-  
-  https://pbs.twimg.com/media/GcB2QbzaoAA9MiG?format=jpg&name=large`;
+#standwithcrypto $byegary
+
+Coins: ${coinsCollected}
+Gary's ByeBye'd 👋: ${enemiesKilled}
+Shots Fired: ${shotsFired}
+Damage Taken: ${lifesLost}
+
+`;
   }
 }
 

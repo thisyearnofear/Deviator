@@ -533,7 +533,7 @@ var Collectible = /*#__PURE__*/function () {
     var bubble = new THREE.Mesh(new THREE.SphereGeometry(10, 100, 100), new THREE.MeshPhongMaterial({
       color: _src_utils_Colors__WEBPACK_IMPORTED_MODULE_9__.COLOR_COLLECTIBLE_BUBBLE,
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.5,
       flatShading: true
     }));
     this.mesh.add(bubble);
@@ -758,8 +758,7 @@ var Sea = /*#__PURE__*/function () {
 }();
 function spawnParticles(pos, count, color, scale) {
   var _loop = function _loop() {
-    var geom = hasSpecialEffects ? new THREE.PlaneGeometry(12, 12) : new THREE.TetrahedronGeometry(3);
-    console.log("Creating particle with special effects:", hasSpecialEffects);
+    var geom = hasSpecialEffects ? new THREE.PlaneGeometry(12, 12) : new THREE.TetrahedronGeometry(3, 0);
     var mat = hasSpecialEffects ? new THREE.MeshPhongMaterial({
       color: 0xffffff,
       map: projectileTexture,
@@ -767,13 +766,16 @@ function spawnParticles(pos, count, color, scale) {
       depthWrite: false,
       side: THREE.DoubleSide
     }) : new THREE.MeshPhongMaterial({
-      color: color,
+      color: 0x009999,
+      shininess: 0,
+      specular: 0xffffff,
       flatShading: true
     });
     var mesh = new THREE.Mesh(geom, mat);
     scene.add(mesh);
     mesh.visible = true;
     mesh.position.copy(pos);
+    mesh.material.color = new THREE.Color(color);
     mesh.material.needsUpdate = true;
     mesh.scale.set(scale, scale, scale);
 
@@ -2597,8 +2599,8 @@ var SocialShare = /*#__PURE__*/function () {
             case 0:
               event.preventDefault();
               text = this.generateShareText();
-              imageUrl = "https://pbs.twimg.com/media/GcB2QbzaoAA9MiG?format=jpg&name=large";
-              url = "https://thebaseglobe.vercel.app";
+              imageUrl = "https://pic.twitter.com/J2LyIkNC94";
+              url = "https://thebaseglobe.netlify.app";
               twitterUrl = "https://twitter.com/intent/tweet?text=".concat(encodeURIComponent(text), "\n\n").concat(encodeURIComponent(imageUrl), "&url=").concat(encodeURIComponent(url));
               window.open(twitterUrl, "_blank", "width=550,height=420");
             case 6:
@@ -2624,7 +2626,7 @@ var SocialShare = /*#__PURE__*/function () {
         shotsFired = _this$gameData$shotsF === void 0 ? 0 : _this$gameData$shotsF,
         _this$gameData$lifesL = _this$gameData.lifesLost,
         lifesLost = _this$gameData$lifesL === void 0 ? 0 : _this$gameData$lifesL;
-      return "Base Around The Globe \uD83C\uDF0E \n    #standwithcrypto $byegary\n  https://thebaseglobe.vercel.app\n  \n  Coins: ".concat(coinsCollected, "\n  Gary's ByeBye'd \uD83D\uDC4B: ").concat(enemiesKilled, "\n  Shots Fired: ").concat(shotsFired, "\n  Damage Taken: ").concat(lifesLost, "\n  \n  https://pbs.twimg.com/media/GcB2QbzaoAA9MiG?format=jpg&name=large");
+      return "Base Around The Globe \uD83C\uDF0E \n#standwithcrypto $byegary\n\nCoins: ".concat(coinsCollected, "\nGary's ByeBye'd \uD83D\uDC4B: ").concat(enemiesKilled, "\nShots Fired: ").concat(shotsFired, "\nDamage Taken: ").concat(lifesLost, "\n\n");
     }
   }]);
 }();
@@ -3392,7 +3394,9 @@ var GameplaySnapshotManager = /*#__PURE__*/function () {
   }, {
     key: "captureSnapshot",
     value: function captureSnapshot() {
-      this.snapshot = "https://pbs.twimg.com/media/GcB2QbzaoAA9MiG?format=jpg&name=large";
+      this.renderer.render(this.scene, this.camera);
+      var dataURL = this.renderer.domElement.toDataURL("image/jpeg", 0.7);
+      this.snapshot = dataURL;
     }
   }, {
     key: "checkGameEnd",
@@ -3899,10 +3903,10 @@ var Colors = {
 };
 
 // Named exports for specific game elements
-var COLOR_COINS = 0xffd700;
+var COLOR_COINS = 0xffff00; // Bright yellow
 var COLOR_COLLECTIBLE_BUBBLE = {
-  color: 0xc8a2c8,
-  opacity: 0.6
+  color: 0x0000ff,
+  opacity: 0.8
 };
 var COLOR_SEA_LEVEL = [0x68c3c0,
 // hsl(178deg 43% 59%)
