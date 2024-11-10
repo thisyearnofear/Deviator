@@ -7,14 +7,23 @@ const BASE_CONTRACT_2 = "0x39e6EED85927e0203c2ae9790eDaeB431B8e43c1";
 
 const CONTRACT_ABI = [
   {
+    constant: true,
     inputs: [
-      { name: "account", type: "address" },
-      { name: "id", type: "uint256" },
+      {
+        name: "_owner",
+        type: "address",
+      },
     ],
     name: "balanceOf",
-    outputs: [{ name: "", type: "uint256" }],
-    type: "function",
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+      },
+    ],
+    payable: false,
     stateMutability: "view",
+    type: "function",
   },
 ];
 
@@ -41,7 +50,7 @@ export async function checkTokenOwnership(contractAddress, network) {
     const address = accounts[0];
 
     const contract = new web3.eth.Contract(CONTRACT_ABI, contractAddress);
-    const balance = await contract.methods.balanceOf(address, 1).call();
+    const balance = await contract.methods.balanceOf(address).call();
 
     console.log(`Balance for ${contractAddress}: ${balance}`);
     return BigInt(balance) > 0n;
