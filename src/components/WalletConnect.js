@@ -85,81 +85,25 @@ async function updateConnectionState(isConnected, userAddress = null) {
 }
 
 const ERC1155_ABI = [
-  [
-    {
-      inputs: [
-        {
-          internalType: "address",
-          name: "_logic",
-          type: "address",
-        },
-      ],
-      stateMutability: "nonpayable",
-      type: "constructor",
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: false,
-          internalType: "address",
-          name: "previousAdmin",
-          type: "address",
-        },
-        {
-          indexed: false,
-          internalType: "address",
-          name: "newAdmin",
-          type: "address",
-        },
-      ],
-      name: "AdminChanged",
-      type: "event",
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: "address",
-          name: "beacon",
-          type: "address",
-        },
-      ],
-      name: "BeaconUpgraded",
-      type: "event",
-    },
-    {
-      anonymous: false,
-      inputs: [
-        {
-          indexed: true,
-          internalType: "address",
-          name: "implementation",
-          type: "address",
-        },
-      ],
-      name: "Upgraded",
-      type: "event",
-    },
-    {
-      stateMutability: "payable",
-      type: "fallback",
-    },
-    {
-      stateMutability: "payable",
-      type: "receive",
-    },
-  ],
+  {
+    constant: true,
+    inputs: [
+      { name: "account", type: "address" },
+      { name: "id", type: "uint256" },
+    ],
+    name: "balanceOf",
+    outputs: [{ name: "", type: "uint256" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
 ];
 
 const ERC1155_CONTRACT_ADDRESS = "0x4a57b15E45d03bd85c8eE38dcFF9E2BF0e87dBCf";
 const TOKEN_ID = 1; // Adjust this if you're looking for a specific token ID
 
 export async function checkERC1155Balance(userAddress) {
-  if (!userAddress) {
-    return false;
-  }
+  if (!userAddress) return false;
 
   const networks = [
     { name: "Base", rpcUrl: CONFIG.baseRpcUrl },
@@ -169,10 +113,18 @@ export async function checkERC1155Balance(userAddress) {
   for (const network of networks) {
     try {
       const web3Instance = new Web3(network.rpcUrl);
-      // Rest of the function remains the same
+      const contract = new web3Instance.eth.Contract(
+        ERC1155_ABI,
+        ERC1155_CONTRACT_ADDRESS
+      );
+      const balance = await contract.methods
+        .balanceOf(userAddress, TOKEN_ID)
+        .call();
+
+      console.log(`ERC1155 Balance on ${network.name}:`, balance);
+      if (balance > 0) return true;
     } catch (error) {
-      console.log(`Error checking balance on ${network.name}, continuing...`);
-      continue;
+      console.log(`Error checking balance on ${network.name}:`, error);
     }
   }
   return false;

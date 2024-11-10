@@ -27,8 +27,10 @@ module.exports = {
   resolve: {
     extensions: [".js"], // Automatically resolve these extensions
     alias: {
-      components: path.resolve(__dirname, "components/"), // Alias for components folder
-      utils: path.resolve(__dirname, "utils/"), // Alias for utils folder
+      "@": path.resolve(__dirname, "src/"),
+      components: path.resolve(__dirname, "src/components/"),
+      utils: path.resolve(__dirname, "src/utils/"),
+      managers: path.resolve(__dirname, "src/managers/"),
     },
   },
   plugins: [
@@ -46,7 +48,20 @@ module.exports = {
   optimization: {
     minimize: true, // Enable minimization
     splitChunks: {
-      chunks: "all", // Split vendor and application code
+      chunks: "all",
+      cacheGroups: {
+        web3: {
+          test: /[\\/]node_modules[\\/]web3[\\/]/,
+          name: "web3",
+          chunks: "all",
+          priority: 10,
+        },
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendors",
+          chunks: "all",
+        },
+      },
     },
   },
 };
