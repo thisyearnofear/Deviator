@@ -70,6 +70,5 @@ module.exports = {
     three: "THREE",
     gsap: "gsap",
     ethers: "ethers",
-    web3: "Web3",
   },
 };

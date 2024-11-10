@@ -1,34 +1,35 @@
 // src/utils/web3Utils.js
 
-import { getWeb3 } from "./web3Provider";
+import { ethers } from "ethers";
+import { CONFIG } from "../config/constants";
 
 const BASE_MEMECOIN_CONTRACT = "0x39e6EED85927e0203c2ae9790eDaeB431B8e43c1";
 
-const TOKEN_ABI = [
-  {
-    inputs: [{ type: "address" }],
-    name: "balanceOf",
-    outputs: [{ type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-];
+const TOKEN_ABI = ["function balanceOf(address owner) view returns (uint256)"];
 
 export async function checkTokenOwnership(contractAddress, network) {
   try {
     console.log(
       `Checking ownership for contract ${contractAddress} on ${network}`
     );
-    const web3 = await getWeb3(network);
-    const accounts = await web3.eth.getAccounts();
-    const address = accounts[0];
+    const provider = new ethers.JsonRpcProvider(CONFIG[`${network}RpcUrl`]);
 
-    // Direct contract interaction without proxy
-    const contract = new web3.eth.Contract(TOKEN_ABI, contractAddress);
-    const balance = await contract.methods.balanceOf(address).call();
+    // Get signer if MetaMask is available
+    let signer;
+    if (window.ethereum) {
+      const web3Provider = new ethers.BrowserProvider(window.ethereum);
+      signer = await web3Provider.getSigner();
+    }
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      TOKEN_ABI,
+      signer || provider
+    );
+    const balance = await contract.balanceOf(await signer.getAddress());
 
     console.log(`Balance for ${contractAddress}: ${balance}`);
-    return BigInt(balance) > 0n;
+    return balance > 0n;
   } catch (error) {
     console.error(
       `Error in checkTokenOwnership for ${contractAddress}:`,

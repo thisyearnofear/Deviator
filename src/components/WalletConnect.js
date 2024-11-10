@@ -1,31 +1,28 @@
 // WalletConnect.js
 
+import { ethers } from "ethers";
 import { CONFIG } from "../config/constants";
-import { getWeb3 } from "../utils/web3Provider";
+import { getProvider } from "../utils/web3Provider";
 
 async function getNetworkInfo() {
   try {
-    const web3 = await getWeb3();
-    const networkId = await web3.eth.net.getId();
-    console.log("Connected to network ID:", networkId);
-    return networkId;
+    const provider = await getProvider();
+    const network = await provider.getNetwork();
+    console.log("Connected to network:", network.name);
+    return network.chainId;
   } catch (error) {
-    console.error("Web3 not initialized");
+    console.error("Provider not initialized");
     return null;
   }
 }
 
 async function getUserAddress() {
   try {
-    const web3 = await getWeb3();
-    const accounts = await web3.eth.getAccounts();
-    if (accounts.length === 0) {
-      console.error("No accounts found");
-      return null;
-    }
-    return accounts[0];
+    const provider = await getProvider();
+    const signer = await provider.getSigner();
+    return await signer.getAddress();
   } catch (error) {
-    console.error("Web3 not initialized");
+    console.error("Provider not initialized");
     return null;
   }
 }
@@ -115,27 +112,25 @@ export async function checkERC1155Balance(userAddress) {
 
   for (const network of networks) {
     try {
-      const web3Instance = await getWeb3(network.name);
-      const proxyContract = new web3Instance.eth.Contract(
+      const provider = await getProvider(network.name);
+      const proxyContract = new ethers.Contract(
+        ERC1155_CONTRACT_ADDRESS,
         IMPLEMENTATION_ABI,
-        ERC1155_CONTRACT_ADDRESS
+        provider
       );
 
       // Get implementation address
-      const implementationAddress = await proxyContract.methods
-        .implementation()
-        .call();
+      const implementationAddress = await proxyContract.implementation();
       console.log(`Implementation address: ${implementationAddress}`);
 
       // Use implementation contract
-      const contract = new web3Instance.eth.Contract(
+      const contract = new ethers.Contract(
+        ERC1155_CONTRACT_ADDRESS,
         ERC1155_ABI,
-        implementationAddress
+        provider
       );
 
-      const balance = await contract.methods
-        .balanceOf(userAddress, TOKEN_ID)
-        .call();
+      const balance = await contract.balanceOf(userAddress, TOKEN_ID);
 
       console.log(`ERC1155 Balance on ${network.name}:`, balance);
       if (balance > 0) return true;
