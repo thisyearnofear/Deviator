@@ -104,7 +104,7 @@ export async function checkSpecialEffectsAccess() {
     const baseOwnership = await checkTokenOwnership(BASE_CONTRACT, "base");
     const baseOwnership2 = await checkTokenOwnership(BASE_CONTRACT_2, "base");
 
-    return ethOwnership || baseOwnership || baseOwnership2;
+    return baseOwnership || baseOwnership2;
   } catch (error) {
     console.error("Error checking special effects access:", error);
     return false;
