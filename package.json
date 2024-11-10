@@ -1,4 +1,9 @@
 {
+    "scripts": {
+        "vercel-build": "bash ./build.sh",
+        "build": "webpack --mode production --config webpack.config.js",
+        "dev": "webpack serve --mode development"
+    },
     "devDependencies": {
         "@babel/core": "^7.23.2",
         "@babel/preset-env": "^7.23.2",
