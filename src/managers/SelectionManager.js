@@ -35,6 +35,7 @@ export class SelectionManager {
     // Add event listener for wallet status changes
     document.addEventListener("walletStatusChanged", (event) => {
       const { hasToken } = event.detail;
+      console.log("Wallet status changed event received:", hasToken);
       this.hasToken = hasToken;
       this.updateSelectionOptions();
     });
@@ -57,9 +58,6 @@ export class SelectionManager {
       console.error("Selection containers not found in the DOM");
       return;
     }
-
-    this.userAddress = null;
-    this.hasToken = false;
 
     this.pilotOptions.forEach((pilot) => {
       const option = this.createSelectionOption(pilot, "pilot");
@@ -223,7 +221,7 @@ export class SelectionManager {
     // Update pilot options visibility
     this.pilotOptions.forEach((pilot) => {
       const pilotElement = document.querySelector(
-        `[data-pilot-id="${pilot.id}"]`
+        `[data-id="${pilot.id}"][data-type="pilot"]`
       );
       if (pilotElement && pilot.tokenRequired) {
         pilotElement.classList.toggle("hidden", !this.hasToken);
@@ -233,12 +231,16 @@ export class SelectionManager {
     // Update aircraft options visibility
     aircraftManager.getAircraftOptions().forEach((aircraft) => {
       const aircraftElement = document.querySelector(
-        `[data-aircraft-id="${aircraft.id}"]`
+        `[data-id="${aircraft.id}"][data-type="aircraft"]`
       );
       if (aircraftElement && aircraft.tokenRequired) {
         aircraftElement.classList.toggle("hidden", !this.hasToken);
       }
     });
+
+    // Log status for debugging
+    console.log("Token status:", this.hasToken);
+    console.log("Updating selection options visibility");
 
     this.updateStartButton();
   }

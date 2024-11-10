@@ -3552,6 +3552,7 @@ var SelectionManager = /*#__PURE__*/function () {
     // Add event listener for wallet status changes
     document.addEventListener("walletStatusChanged", function (event) {
       var hasToken = event.detail.hasToken;
+      console.log("Wallet status changed event received:", hasToken);
       _this.hasToken = hasToken;
       _this.updateSelectionOptions();
     });
@@ -3584,8 +3585,6 @@ var SelectionManager = /*#__PURE__*/function () {
               console.error("Selection containers not found in the DOM");
               return _context.abrupt("return");
             case 5:
-              this.userAddress = null;
-              this.hasToken = false;
               this.pilotOptions.forEach(function (pilot) {
                 var option = _this2.createSelectionOption(pilot, "pilot");
                 if (pilot.tokenRequired) {
@@ -3601,7 +3600,7 @@ var SelectionManager = /*#__PURE__*/function () {
                 aircraftOptionsContainer.appendChild(option);
               });
               this.updateStartButton();
-            case 10:
+            case 8:
             case "end":
               return _context.stop();
           }
@@ -3751,7 +3750,7 @@ var SelectionManager = /*#__PURE__*/function () {
       var _this6 = this;
       // Update pilot options visibility
       this.pilotOptions.forEach(function (pilot) {
-        var pilotElement = document.querySelector("[data-pilot-id=\"".concat(pilot.id, "\"]"));
+        var pilotElement = document.querySelector("[data-id=\"".concat(pilot.id, "\"][data-type=\"pilot\"]"));
         if (pilotElement && pilot.tokenRequired) {
           pilotElement.classList.toggle("hidden", !_this6.hasToken);
         }
@@ -3759,11 +3758,15 @@ var SelectionManager = /*#__PURE__*/function () {
 
       // Update aircraft options visibility
       _AircraftManager__WEBPACK_IMPORTED_MODULE_0__.aircraftManager.getAircraftOptions().forEach(function (aircraft) {
-        var aircraftElement = document.querySelector("[data-aircraft-id=\"".concat(aircraft.id, "\"]"));
+        var aircraftElement = document.querySelector("[data-id=\"".concat(aircraft.id, "\"][data-type=\"aircraft\"]"));
         if (aircraftElement && aircraft.tokenRequired) {
           aircraftElement.classList.toggle("hidden", !_this6.hasToken);
         }
       });
+
+      // Log status for debugging
+      console.log("Token status:", this.hasToken);
+      console.log("Updating selection options visibility");
       this.updateStartButton();
     }
   }, {
@@ -4192,7 +4195,7 @@ function _checkSpecialEffectsAccess() {
           return checkTokenOwnership(BASE_CONTRACT_2, "base");
         case 6:
           baseOwnership2 = _context3.sent;
-          return _context3.abrupt("return", ethOwnership || baseOwnership || baseOwnership2);
+          return _context3.abrupt("return", baseOwnership || baseOwnership2);
         case 10:
           _context3.prev = 10;
           _context3.t0 = _context3["catch"](0);
