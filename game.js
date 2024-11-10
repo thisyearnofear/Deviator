@@ -14,6 +14,19 @@ import {
   COLOR_COLLECTIBLE_BUBBLE,
 } from "./src/utils/Colors";
 
+let projectileTexture = null;
+
+loadingProgressManager
+  .loadTexture("./public/gens.png")
+  .then((texture) => {
+    console.log("Texture loaded:", texture);
+    projectileTexture = texture;
+    // Set some texture properties
+    texture.premultiplyAlpha = true;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+  })
+  .catch((error) => console.error("Failed to load texture:", error));
 let sky;
 let gameplaySnapshotManager;
 
@@ -738,25 +751,33 @@ class Sea {
 
 function spawnParticles(pos, count, color, scale) {
   for (let i = 0; i < count; i++) {
-    const geom = new THREE.TetrahedronGeometry(3, 0);
+    const geom = new THREE.PlaneGeometry(6, 6);
     const mat = new THREE.MeshPhongMaterial({
-      color: 0x009999,
+      color: 0xffffff, // Use white to not tint the texture
       shininess: 0,
       specular: 0xffffff,
       flatShading: true,
+      map: projectileTexture,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
     });
     const mesh = new THREE.Mesh(geom, mat);
     scene.add(mesh);
 
     mesh.visible = true;
     mesh.position.copy(pos);
-    mesh.material.color = new THREE.Color(color);
     mesh.material.needsUpdate = true;
     mesh.scale.set(scale, scale, scale);
+
+    // Make particle always face the camera
+    mesh.lookAt(camera.position);
+
     const targetX = pos.x + (-1 + Math.random() * 2) * 50;
     const targetY = pos.y + (-1 + Math.random() * 2) * 50;
     const targetZ = pos.z + (-1 + Math.random() * 2) * 50;
     const speed = 0.6 + Math.random() * 0.2;
+
     TweenMax.to(mesh.rotation, speed, {
       x: Math.random() * 12,
       y: Math.random() * 12,
@@ -778,13 +799,23 @@ function spawnParticles(pos, count, color, scale) {
 // ENEMIES
 class Enemy {
   constructor() {
-    var geom = new THREE.TetrahedronGeometry(8, 2);
-    var mat = new THREE.MeshPhongMaterial({
-      color: Colors.red,
+    const geom = new THREE.PlaneGeometry(24, 24);
+    const mat = new THREE.MeshPhongMaterial({
+      color: 0xffffff,
       shininess: 0,
       specular: 0xffffff,
       flatShading: true,
+      map: projectileTexture,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      alphaTest: 0.5,
     });
+
+    if (!projectileTexture) {
+      console.warn("Texture not loaded yet!");
+    }
+
     this.mesh = new THREE.Mesh(geom, mat);
     this.mesh.castShadow = true;
     this.angle = 0;
@@ -795,8 +826,9 @@ class Enemy {
 
   tick(deltaTime) {
     rotateAroundSea(this, deltaTime, world.enemiesSpeed);
-    this.mesh.rotation.y += Math.random() * 0.1;
-    this.mesh.rotation.z += Math.random() * 0.1;
+
+    // Make enemy always face the camera
+    this.mesh.lookAt(camera.position);
 
     // collision?
     if (
@@ -915,15 +947,23 @@ let allProjectiles = [];
 
 class Projectile {
   constructor(damage, initialPosition, direction, speed, radius, length) {
-    const PROJECTILE_COLOR = Colors.brownDark; // 0x333333
-
     this.damage = damage;
+
+    // Create material with bright purple color
+    const material = new THREE.MeshPhongMaterial({
+      color: 0x800080, // Bright purple
+      shininess: 0,
+      specular: 0xffffff,
+      flatShading: true,
+    });
+
     this.mesh = new THREE.Mesh(
       new THREE.CylinderGeometry(radius, radius, length),
-      new THREE.LineBasicMaterial({ color: PROJECTILE_COLOR })
+      material
     );
-    this.mesh.position.copy(initialPosition);
     this.mesh.rotation.z = Math.PI / 2;
+
+    this.mesh.position.copy(initialPosition);
     this.direction = direction.clone();
     this.direction.setLength(1);
     this.speed = speed;
@@ -937,7 +977,6 @@ class Projectile {
       this.direction.clone().multiplyScalar(this.speed * deltaTime)
     );
     this.mesh.position.z *= 0.9;
-    // out of screen? => remove
     if (this.mesh.position.x > MAX_WORLD_X) {
       this.remove();
     }
@@ -957,6 +996,11 @@ function spawnProjectile(
   radius,
   length
 ) {
+  const geometry = new THREE.PlaneGeometry(radius * 2, length);
+  const material = new THREE.MeshBasicMaterial({
+    color: 0x800080, // Bright purple
+  });
+
   allProjectiles.push(
     new Projectile(damage, initialPosition, direction, speed, radius, length)
   );
@@ -965,6 +1009,33 @@ function spawnProjectile(
 // 3D Models
 let sea, sea2;
 let airplane;
+
+// Add this after the texture loading
+const createProjectile = (
+  damage,
+  initialPosition,
+  direction,
+  speed,
+  radius,
+  length
+) => {
+  console.log("Creating projectile");
+  const material = new THREE.MeshPhongMaterial({
+    color: 0x800080, // Bright purple
+    shininess: 0,
+    specular: 0xffffff,
+    flatShading: true,
+    map: projectileTexture, // The texture might be overriding our color
+  });
+  console.log("Projectile material color:", material.color);
+
+  // sourcery skip: inline-immediately-returned-variable
+  const mesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(radius, radius, length),
+    material
+  );
+  return mesh;
+};
 
 function createPlane() {
   const { pilot, aircraft } = selectionManager.getSelection();
