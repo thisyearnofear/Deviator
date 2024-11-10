@@ -19,7 +19,10 @@ export const Colors = {
 
 // Named exports for specific game elements
 export const COLOR_COINS = 0xffd700;
-export const COLOR_COLLECTIBLE_BUBBLE = COLOR_COINS;
+export const COLOR_COLLECTIBLE_BUBBLE = {
+  color: 0xc8a2c8,
+  opacity: 0.6,
+};
 export const COLOR_SEA_LEVEL = [
   0x68c3c0, // hsl(178deg 43% 59%)
   0x47b3af, // hsl(178deg 43% 49%)

@@ -12,19 +12,42 @@ import {
   Colors,
   COLOR_COINS,
   COLOR_COLLECTIBLE_BUBBLE,
+  COLOR_COLLECTIBLE,
 } from "./src/utils/Colors";
 
+import { checkTokenOwnership } from "./src/utils/web3Utils";
+
 let projectileTexture = null;
+let hasSpecialEffects = false;
+
+async function checkSpecialEffectsAccess() {
+  try {
+    const baseTokenOwned = await checkTokenOwnership(
+      "0x1dd4245bc6b1bbd43caf9a5033e887067852123d",
+      "base"
+    );
+    const baseTokenOwned2 = await checkTokenOwnership(
+      "0x39e6EED85927e0203c2ae9790eDaeB431B8e43c1",
+      "base"
+    );
+    hasSpecialEffects = baseTokenOwned || baseTokenOwned2;
+    console.log("Special effects access:", hasSpecialEffects);
+  } catch (error) {
+    console.error("Error checking token ownership:", error);
+    hasSpecialEffects = false;
+  }
+}
 
 loadingProgressManager
   .loadTexture("./public/gens.png")
   .then((texture) => {
     console.log("Texture loaded:", texture);
     projectileTexture = texture;
-    // Set some texture properties
     texture.premultiplyAlpha = true;
     texture.minFilter = THREE.LinearFilter;
     texture.magFilter = THREE.LinearFilter;
+
+    checkSpecialEffectsAccess();
   })
   .catch((error) => console.error("Failed to load texture:", error));
 let sky;
@@ -751,17 +774,24 @@ class Sea {
 
 function spawnParticles(pos, count, color, scale) {
   for (let i = 0; i < count; i++) {
-    const geom = new THREE.PlaneGeometry(6, 6);
-    const mat = new THREE.MeshPhongMaterial({
-      color: 0xffffff, // Use white to not tint the texture
-      shininess: 0,
-      specular: 0xffffff,
-      flatShading: true,
-      map: projectileTexture,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
+    const geom = hasSpecialEffects
+      ? new THREE.PlaneGeometry(12, 12)
+      : new THREE.TetrahedronGeometry(3);
+    console.log("Creating particle with special effects:", hasSpecialEffects);
+
+    const mat = hasSpecialEffects
+      ? new THREE.MeshPhongMaterial({
+          color: 0xffffff,
+          map: projectileTexture,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        })
+      : new THREE.MeshPhongMaterial({
+          color: color,
+          flatShading: true,
+        });
+
     const mesh = new THREE.Mesh(geom, mat);
     scene.add(mesh);
 
@@ -799,22 +829,22 @@ function spawnParticles(pos, count, color, scale) {
 // ENEMIES
 class Enemy {
   constructor() {
-    const geom = new THREE.PlaneGeometry(24, 24);
-    const mat = new THREE.MeshPhongMaterial({
-      color: 0xffffff,
-      shininess: 0,
-      specular: 0xffffff,
-      flatShading: true,
-      map: projectileTexture,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      alphaTest: 0.5,
-    });
+    const geom = hasSpecialEffects
+      ? new THREE.PlaneGeometry(24, 24)
+      : new THREE.TetrahedronGeometry(8);
 
-    if (!projectileTexture) {
-      console.warn("Texture not loaded yet!");
-    }
+    const mat = hasSpecialEffects
+      ? new THREE.MeshPhongMaterial({
+          color: 0xffffff,
+          map: projectileTexture,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        })
+      : new THREE.MeshPhongMaterial({
+          color: 0xf7932f, // Original orange/brown color
+          flatShading: true,
+        });
 
     this.mesh = new THREE.Mesh(geom, mat);
     this.mesh.castShadow = true;

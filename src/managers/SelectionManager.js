@@ -24,12 +24,28 @@ export class SelectionManager {
 
     document.addEventListener("DOMContentLoaded", () => {
       this.initSelectionScreen();
+      this.setupInfoModal();
       this.startButton = document.getElementById("start-game");
       this.startButtonTooltip = document.getElementById("start-game-tooltip");
       this.startButton.addEventListener("click", () => this.handleStartClick());
       this.startButton.addEventListener("mouseenter", () => this.showTooltip());
       this.startButton.addEventListener("mouseleave", () => this.hideTooltip());
     });
+
+    // Add event listener for wallet status changes
+    document.addEventListener("walletStatusChanged", (event) => {
+      const { hasToken } = event.detail;
+      this.hasToken = hasToken;
+      this.updateSelectionOptions();
+    });
+
+    // Check localStorage on init
+    const savedWalletState = localStorage.getItem("walletState");
+    if (savedWalletState) {
+      const { userAddress, hasToken } = JSON.parse(savedWalletState);
+      this.userAddress = userAddress;
+      this.hasToken = hasToken;
+    }
   }
 
   async initSelectionScreen() {
@@ -42,15 +58,8 @@ export class SelectionManager {
       return;
     }
 
-    try {
-      const result = await connectWallet();
-      this.userAddress = result.userAddress;
-      this.hasToken = result.hasToken;
-    } catch (error) {
-      console.error("Error connecting wallet:", error);
-      this.userAddress = null;
-      this.hasToken = false;
-    }
+    this.userAddress = null;
+    this.hasToken = false;
 
     this.pilotOptions.forEach((pilot) => {
       const option = this.createSelectionOption(pilot, "pilot");
@@ -208,6 +217,69 @@ export class SelectionManager {
       pilot: this.selectedPilot,
       aircraft: this.selectedAircraft,
     };
+  }
+
+  updateSelectionOptions() {
+    // Update pilot options visibility
+    this.pilotOptions.forEach((pilot) => {
+      const pilotElement = document.querySelector(
+        `[data-pilot-id="${pilot.id}"]`
+      );
+      if (pilotElement && pilot.tokenRequired) {
+        pilotElement.classList.toggle("hidden", !this.hasToken);
+      }
+    });
+
+    // Update aircraft options visibility
+    aircraftManager.getAircraftOptions().forEach((aircraft) => {
+      const aircraftElement = document.querySelector(
+        `[data-aircraft-id="${aircraft.id}"]`
+      );
+      if (aircraftElement && aircraft.tokenRequired) {
+        aircraftElement.classList.toggle("hidden", !this.hasToken);
+      }
+    });
+
+    this.updateStartButton();
+  }
+
+  setupInfoModal() {
+    const infoIcon = document.getElementById("selection-info");
+    const infoModal = document.getElementById("info-modal");
+    const closeInfo = document.querySelector(".close-info");
+
+    if (!infoIcon || !infoModal || !closeInfo) {
+      console.error("Info modal elements not found");
+      return;
+    }
+
+    // Create a separate container for the modal
+    const modalContainer = document.createElement("div");
+    modalContainer.id = "info-modal-container";
+    modalContainer.style.position = "absolute";
+    modalContainer.style.zIndex = "1000";
+    document.body.appendChild(modalContainer);
+    modalContainer.appendChild(infoModal);
+
+    infoIcon.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const iconRect = infoIcon.getBoundingClientRect();
+      modalContainer.style.top = `${iconRect.bottom + 10}px`;
+      modalContainer.style.left = `${iconRect.left}px`;
+      infoModal.classList.remove("hidden");
+    });
+
+    closeInfo.addEventListener("click", (e) => {
+      e.stopPropagation();
+      infoModal.classList.add("hidden");
+    });
+
+    // Close on click outside of modal content
+    document.addEventListener("click", (e) => {
+      if (!infoModal.contains(e.target) && e.target !== infoIcon) {
+        infoModal.classList.add("hidden");
+      }
+    });
   }
 }
 
