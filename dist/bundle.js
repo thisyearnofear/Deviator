@@ -2857,56 +2857,24 @@ function _updateConnectionState() {
   }));
   return _updateConnectionState.apply(this, arguments);
 }
-var ERC1155_ABI = [[{
+var ERC1155_ABI = [{
+  constant: true,
   inputs: [{
-    internalType: "address",
-    name: "_logic",
-    type: "address"
-  }],
-  stateMutability: "nonpayable",
-  type: "constructor"
-}, {
-  anonymous: false,
-  inputs: [{
-    indexed: false,
-    internalType: "address",
-    name: "previousAdmin",
+    name: "account",
     type: "address"
   }, {
-    indexed: false,
-    internalType: "address",
-    name: "newAdmin",
-    type: "address"
+    name: "id",
+    type: "uint256"
   }],
-  name: "AdminChanged",
-  type: "event"
-}, {
-  anonymous: false,
-  inputs: [{
-    indexed: true,
-    internalType: "address",
-    name: "beacon",
-    type: "address"
+  name: "balanceOf",
+  outputs: [{
+    name: "",
+    type: "uint256"
   }],
-  name: "BeaconUpgraded",
-  type: "event"
-}, {
-  anonymous: false,
-  inputs: [{
-    indexed: true,
-    internalType: "address",
-    name: "implementation",
-    type: "address"
-  }],
-  name: "Upgraded",
-  type: "event"
-}, {
-  stateMutability: "payable",
-  type: "fallback"
-}, {
-  stateMutability: "payable",
-  type: "receive"
-}]];
+  payable: false,
+  stateMutability: "view",
+  type: "function"
+}];
 var ERC1155_CONTRACT_ADDRESS = "0x4a57b15E45d03bd85c8eE38dcFF9E2BF0e87dBCf";
 var TOKEN_ID = 1; // Adjust this if you're looking for a specific token ID
 
@@ -2915,7 +2883,7 @@ function checkERC1155Balance(_x4) {
 }
 function _checkERC1155Balance() {
   _checkERC1155Balance = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7(userAddress) {
-    var networks, _i, _networks, network, web3Instance;
+    var networks, _i, _networks, network, web3Instance, contract, balance;
     return _regeneratorRuntime().wrap(function _callee7$(_context7) {
       while (1) switch (_context7.prev = _context7.next) {
         case 0:
@@ -2935,30 +2903,41 @@ function _checkERC1155Balance() {
           _i = 0, _networks = networks;
         case 4:
           if (!(_i < _networks.length)) {
-            _context7.next = 17;
+            _context7.next = 23;
             break;
           }
           network = _networks[_i];
           _context7.prev = 6;
-          web3Instance = new Web3(network.rpcUrl); // Rest of the function remains the same
-          _context7.next = 14;
+          web3Instance = new Web3(network.rpcUrl);
+          contract = new web3Instance.eth.Contract(ERC1155_ABI, ERC1155_CONTRACT_ADDRESS);
+          _context7.next = 11;
+          return contract.methods.balanceOf(userAddress, TOKEN_ID).call();
+        case 11:
+          balance = _context7.sent;
+          console.log("ERC1155 Balance on ".concat(network.name, ":"), balance);
+          if (!(balance > 0)) {
+            _context7.next = 15;
+            break;
+          }
+          return _context7.abrupt("return", true);
+        case 15:
+          _context7.next = 20;
           break;
-        case 10:
-          _context7.prev = 10;
+        case 17:
+          _context7.prev = 17;
           _context7.t0 = _context7["catch"](6);
-          console.log("Error checking balance on ".concat(network.name, ", continuing..."));
-          return _context7.abrupt("continue", 14);
-        case 14:
+          console.log("Error checking balance on ".concat(network.name, ":"), _context7.t0);
+        case 20:
           _i++;
           _context7.next = 4;
           break;
-        case 17:
+        case 23:
           return _context7.abrupt("return", false);
-        case 18:
+        case 24:
         case "end":
           return _context7.stop();
       }
-    }, _callee7, null, [[6, 10]]);
+    }, _callee7, null, [[6, 17]]);
   }));
   return _checkERC1155Balance.apply(this, arguments);
 }
