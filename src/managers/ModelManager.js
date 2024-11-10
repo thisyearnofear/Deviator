@@ -1,4 +1,4 @@
-import { loadingProgressManager } from "./loadingProgressManager";
+import { loadingProgressManager } from "./LoadingProgressManager";
 
 export class ModelManager {
   constructor(path) {

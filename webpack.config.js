@@ -3,12 +3,12 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
-  mode: "production", // Set mode to production
+  mode: "production",
   entry: "./game.js",
   output: {
     filename: "bundle.js",
     path: path.resolve(__dirname, "dist"),
-    publicPath: "/dist/", // Ensure this matches your deployment structure
+    publicPath: "/dist/",
   },
   module: {
     rules: [
@@ -18,26 +18,27 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ["@babel/preset-env"], // Ensure compatibility with older browsers
+            presets: ["@babel/preset-env"],
           },
         },
       },
     ],
   },
   resolve: {
-    extensions: [".js"], // Automatically resolve these extensions
+    extensions: [".js"],
     alias: {
       "@": path.resolve(__dirname, "src/"),
       components: path.resolve(__dirname, "src/components/"),
       utils: path.resolve(__dirname, "src/utils/"),
       managers: path.resolve(__dirname, "src/managers/"),
     },
+    enforceExtension: false,
   },
   plugins: [
-    new CleanWebpackPlugin(), // Clean the output directory before each build
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: "./index.html", // Use your index.html as a template
-      filename: "index.html", // Output file name
+      template: "./index.html",
+      filename: "index.html",
       minify: {
         removeComments: true,
         collapseWhitespace: true,
@@ -46,7 +47,7 @@ module.exports = {
     }),
   ],
   optimization: {
-    minimize: true, // Enable minimization
+    minimize: true,
     splitChunks: {
       chunks: "all",
       cacheGroups: {
@@ -64,7 +65,7 @@ module.exports = {
       },
     },
   },
-  devtool: "source-map", // Add this for production debugging
+  devtool: "source-map",
   externals: {
     three: "THREE",
     gsap: "gsap",
