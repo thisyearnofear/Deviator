@@ -237,4 +237,11 @@ chunks: "all",
 },
 },
 },
+devtool: "source-map", // Add this for production debugging
+externals: {
+three: "THREE",
+gsap: "gsap",
+web3: "Web3",
+ethers: "ethers",
+},
 };

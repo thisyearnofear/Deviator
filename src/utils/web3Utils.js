@@ -1,6 +1,6 @@
 // src/utils/web3Utils.js
 
-import { BrowserProvider, Contract } from "ethers";
+import Web3 from "web3";
 
 const BASE_CONTRACT = "0x1dd4245bc6b1bbd43caf9a5033e887067852123d";
 const BASE_CONTRACT_2 = "0x39e6EED85927e0203c2ae9790eDaeB431B8e43c1";
@@ -51,11 +51,11 @@ async function getProvider(network) {
     throw new Error("No ethereum provider found");
   }
 
-  console.log("Creating BrowserProvider...");
-  const provider = new BrowserProvider(window.ethereum);
-  console.log("Provider created successfully");
+  console.log("Creating Web3 instance...");
+  const web3 = new Web3(window.ethereum);
+  console.log("Web3 instance created successfully");
 
-  return provider;
+  return web3;
 }
 
 export async function checkTokenOwnership(contractAddress, network) {
@@ -63,9 +63,9 @@ export async function checkTokenOwnership(contractAddress, network) {
     console.log(
       `Checking ownership for contract ${contractAddress} on ${network}`
     );
-    const provider = await getProvider(network);
-    const signer = await provider.getSigner();
-    const address = await signer.getAddress();
+    const web3 = await getProvider(network);
+    const accounts = await web3.eth.getAccounts();
+    const address = accounts[0];
     console.log(`Using address: ${address}`);
 
     // Try each contract type in sequence
@@ -75,14 +75,14 @@ export async function checkTokenOwnership(contractAddress, network) {
       ["ERC20", ERC20_ABI],
     ]) {
       try {
-        const contract = new Contract(contractAddress, abi, provider);
+        const contract = new web3.eth.Contract(abi, contractAddress);
         const balance =
           type === "ERC1155"
-            ? await contract.balanceOf(address, 1)
-            : await contract.balanceOf(address);
+            ? await contract.methods.balanceOf(address, 1).call()
+            : await contract.methods.balanceOf(address).call();
 
         console.log(`${type} Balance for ${contractAddress}: ${balance}`);
-        return balance > 0;
+        return BigInt(balance) > 0n;
       } catch (error) {
         console.log(`Not a ${type} contract, trying next type...`);
       }
