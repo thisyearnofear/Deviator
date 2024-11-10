@@ -1,20 +1,16 @@
 #!/bin/bash
-set -e  # Exit on error
+set -e
 
-# Install dependencies including dev dependencies
-npm ci
+# Create required directories
+mkdir -p dist/models dist/textures dist/sounds public
+# Create placeholder files to prevent webpack errors
+touch textures/.gitkeep sounds/.gitkeep models/.gitkeep public/.gitkeep
 
-# Create dist directory if it doesn't exist
-mkdir -p dist/src/managers
+# Install all dependencies from package.json first
+npm install
 
-# Copy required static files with correct case
-cp -r src/managers/LoadingProgressManager.js dist/src/managers/
-cp -r src/managers/* dist/managers/ || true
-cp game.js dist/
-cp index.html dist/
+# Install additional webpack plugins explicitly if needed
+npm install --save-dev copy-webpack-plugin file-loader @babel/plugin-transform-runtime
 
 # Build with webpack
-npx webpack --mode production --config webpack.config.js || {
-    echo "Webpack build failed"
-    exit 1
-}
+npx webpack --mode production
