@@ -280,28 +280,22 @@
     </div>
 
     <script>
-      // Audio context initialization after user interaction
-      document.addEventListener(
-        "click",
-        function initAudio() {
-          if (window.AudioContext || window.webkitAudioContext) {
-            const AudioContext =
-              window.AudioContext || window.webkitAudioContext;
-            const audioContext = new AudioContext();
-            if (audioContext.state === "suspended") {
-              audioContext.resume();
-            }
-            window.gameAudioContext = audioContext;
-          }
-          document.removeEventListener("click", initAudio);
-        },
-        { once: true }
-      );
+      window.initAudioContext = function () {
+        if (!window.gameAudioContext) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          window.gameAudioContext = new AudioContext();
+        }
+        if (window.gameAudioContext.state === "suspended") {
+          window.gameAudioContext.resume();
+        }
+      };
+
+      // Initialize on user interaction
+      window.addEventListener("click", initAudioContext, { once: true });
+      window.addEventListener("touchstart", initAudioContext, { once: true });
     </script>
 
     <!-- Load the webpack bundles -->
-    <script defer src="/runtime.js"></script>
-    <script defer src="/vendors.js"></script>
     <script defer src="/main.js"></script>
   </body>
 </html>

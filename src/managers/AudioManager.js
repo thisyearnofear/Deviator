@@ -2,35 +2,40 @@
 import { loadingProgressManager } from "./LoadingProgressManager.js";
 export class AudioManager {
   constructor() {
-    this.buffers = {};
-    this.loader = new THREE.AudioLoader();
-    this.listener = new THREE.AudioListener();
+    this.sounds = new Map();
+    this.audioContext = null;
     this.categories = {};
+  }
+
+  init() {
+    if (window.gameAudioContext) {
+      this.audioContext = window.gameAudioContext;
+    }
+  }
+
+  async load(id, name, url) {
+    try {
+      const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
+
+      if (!this.audioContext && window.gameAudioContext) {
+        this.audioContext = window.gameAudioContext;
+      }
+
+      if (!this.audioContext) {
+        console.warn("AudioContext not initialized");
+        return;
+      }
+
+      const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+      this.sounds.set(id, audioBuffer);
+    } catch (error) {
+      console.error(`Error loading sound ${id}:`, error);
+    }
   }
 
   setCamera(camera) {
     camera.add(this.listener);
-  }
-
-  load(soundId, category, path) {
-    const promise = new Promise((resolve, reject) => {
-      this.loader.load(
-        path,
-        (audioBuffer) => {
-          this.buffers[soundId] = audioBuffer;
-          if (category !== null) {
-            if (!this.categories[category]) {
-              this.categories[category] = [];
-            }
-            this.categories[category].push(soundId);
-          }
-          resolve();
-        },
-        () => {},
-        reject
-      );
-    });
-    loadingProgressManager.add(promise);
   }
 
   play(soundIdOrCategory, options = {}) {
@@ -40,7 +45,7 @@ export class AudioManager {
       soundId = category[Math.floor(Math.random() * category.length)];
     }
 
-    const buffer = this.buffers[soundId];
+    const buffer = this.sounds.get(soundId);
     const sound = new THREE.Audio(this.listener);
     sound.setBuffer(buffer);
     if (options.loop) {

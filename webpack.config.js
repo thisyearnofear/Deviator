@@ -7,7 +7,7 @@ module.exports = {
   mode: "production",
   entry: "./game.js",
   output: {
-    filename: "[name].js",
+    filename: "main.js",
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
     clean: true,
@@ -29,14 +29,14 @@ module.exports = {
         test: /\.(mp3|wav)$/,
         type: "asset/resource",
         generator: {
-          filename: "assets/audio/[name][ext]",
+          filename: "audio/[name][ext]",
         },
       },
       {
         test: /\.(png|jpg|jpeg|gif)$/,
         type: "asset/resource",
         generator: {
-          filename: "assets/images/[name][ext]",
+          filename: "images/[name][ext]",
         },
       },
     ],
@@ -65,6 +65,11 @@ module.exports = {
           noErrorOnMissing: true,
         },
         {
+          from: "audio",
+          to: "audio",
+          noErrorOnMissing: true,
+        },
+        {
           from: "*.css",
           to: "[name][ext]",
         },
@@ -72,20 +77,11 @@ module.exports = {
           from: "*.png",
           to: "[name][ext]",
         },
-        {
-          from: "audio",
-          to: "assets/audio",
-          noErrorOnMissing: true,
-        },
       ],
     }),
   ],
   optimization: {
-    splitChunks: {
-      chunks: "all",
-      name: "vendors",
-    },
-    runtimeChunk: "single",
+    minimize: true,
   },
   performance: {
     hints: false,
