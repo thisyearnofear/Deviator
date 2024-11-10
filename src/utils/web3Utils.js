@@ -7,11 +7,9 @@ const BASE_CONTRACT_2 = "0x39e6EED85927e0203c2ae9790eDaeB431B8e43c1";
 
 const PROXY_ABI = [
   {
-    constant: true,
     inputs: [],
     name: "implementation",
-    outputs: [{ name: "", type: "address" }],
-    payable: false,
+    outputs: [{ type: "address" }],
     stateMutability: "view",
     type: "function",
   },
@@ -19,11 +17,9 @@ const PROXY_ABI = [
 
 const TOKEN_ABI = [
   {
-    constant: true,
-    inputs: [{ name: "owner", type: "address" }],
+    inputs: [{ type: "address" }],
     name: "balanceOf",
-    outputs: [{ name: "", type: "uint256" }],
-    payable: false,
+    outputs: [{ type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
