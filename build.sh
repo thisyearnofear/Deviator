@@ -1,6 +1,6 @@
 #!/bin/bash
-# Install dependencies
-npm ci --only=production
+# Install dependencies including dev dependencies
+npm ci
 
 # Build with webpack
 npx webpack --mode production --config webpack.config.js
