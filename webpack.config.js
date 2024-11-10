@@ -31,6 +31,7 @@ module.exports = {
       components: path.resolve(__dirname, "src/components/"),
       utils: path.resolve(__dirname, "src/utils/"),
       managers: path.resolve(__dirname, "src/managers/"),
+      config: path.resolve(__dirname, "src/config/"),
     },
   },
   plugins: [
@@ -68,7 +69,7 @@ module.exports = {
   externals: {
     three: "THREE",
     gsap: "gsap",
-    web3: "Web3",
     ethers: "ethers",
+    web3: "Web3",
   },
 };

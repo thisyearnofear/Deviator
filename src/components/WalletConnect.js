@@ -1,51 +1,33 @@
 // WalletConnect.js
 
-const CONFIG = {
-  mainnetRpcUrl:
-    "https://sepolia.infura.io/v3/b52163bdfadb414386c2b1b84578a39b",
-  baseRpcUrl:
-    "https://base-sepolia.infura.io/v3/b52163bdfadb414386c2b1b84578a39b",
-  zoraRpcUrl: "https://rpc.zora.energy",
-};
-
-let web3;
-
-async function setupWeb3() {
-  console.log("Setting up Web3...");
-  try {
-    if (typeof window.ethereum !== "undefined") {
-      web3 = new Web3(window.ethereum);
-    } else {
-      web3 = new Web3(new Web3.providers.HttpProvider(CONFIG.mainnetRpcUrl));
-    }
-    console.log("Web3 setup complete");
-  } catch (error) {
-    console.log("Web3 setup failed, continuing with limited functionality");
-    // Don't throw error, just continue
-  }
-}
+import { CONFIG } from "../config/constants";
+import { getWeb3 } from "../utils/web3Provider";
 
 async function getNetworkInfo() {
-  if (!web3) {
+  try {
+    const web3 = await getWeb3();
+    const networkId = await web3.eth.net.getId();
+    console.log("Connected to network ID:", networkId);
+    return networkId;
+  } catch (error) {
     console.error("Web3 not initialized");
-    return;
+    return null;
   }
-  const networkId = await web3.eth.net.getId();
-  console.log("Connected to network ID:", networkId);
-  return networkId;
 }
 
 async function getUserAddress() {
-  if (!web3) {
+  try {
+    const web3 = await getWeb3();
+    const accounts = await web3.eth.getAccounts();
+    if (accounts.length === 0) {
+      console.error("No accounts found");
+      return null;
+    }
+    return accounts[0];
+  } catch (error) {
     console.error("Web3 not initialized");
-    return;
-  }
-  const accounts = await web3.eth.getAccounts();
-  if (accounts.length === 0) {
-    console.error("No accounts found");
     return null;
   }
-  return accounts[0];
 }
 
 async function resolveENSName(address) {
@@ -127,13 +109,13 @@ export async function checkERC1155Balance(userAddress) {
   if (!userAddress) return false;
 
   const networks = [
-    { name: "Base", rpcUrl: CONFIG.baseRpcUrl },
-    { name: "Zora", rpcUrl: CONFIG.zoraRpcUrl },
+    { name: "base", rpcUrl: CONFIG.baseRpcUrl },
+    { name: "zora", rpcUrl: CONFIG.zoraRpcUrl },
   ];
 
   for (const network of networks) {
     try {
-      const web3Instance = new Web3(network.rpcUrl);
+      const web3Instance = await getWeb3(network.name);
       const proxyContract = new web3Instance.eth.Contract(
         IMPLEMENTATION_ABI,
         ERC1155_CONTRACT_ADDRESS
@@ -242,7 +224,6 @@ async function setupEventListeners() {
 async function initializeWalletConnect() {
   try {
     console.log("Initializing WalletConnect...");
-    await setupWeb3();
     await setupEventListeners();
 
     // Only check localStorage and update UI if there was a previous connection

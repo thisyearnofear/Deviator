@@ -22,6 +22,16 @@ export class SelectionManager {
     this.userAddress = null;
     this.hasToken = false;
 
+    this.cleanup = () => {
+      document.removeEventListener(
+        "DOMContentLoaded",
+        this.initSelectionScreen
+      );
+      this.startButton?.removeEventListener("click", this.handleStartClick);
+      this.startButton?.removeEventListener("mouseenter", this.showTooltip);
+      this.startButton?.removeEventListener("mouseleave", this.hideTooltip);
+    };
+
     document.addEventListener("DOMContentLoaded", () => {
       this.initSelectionScreen();
       this.setupInfoModal();
@@ -282,6 +292,10 @@ export class SelectionManager {
         infoModal.classList.add("hidden");
       }
     });
+  }
+
+  destroy() {
+    this.cleanup();
   }
 }
 

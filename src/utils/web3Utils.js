@@ -1,20 +1,11 @@
 // src/utils/web3Utils.js
 
-import Web3 from "web3";
+import { getWeb3 } from "./web3Provider";
 
 const BASE_CONTRACT = "0x1dd4245bc6b1bbd43caf9a5033e887067852123d";
 const BASE_CONTRACT_2 = "0x39e6EED85927e0203c2ae9790eDaeB431B8e43c1";
 
-const IMPLEMENTATION_ABI = [
-  {
-    constant: true,
-    inputs: [{ name: "owner", type: "address" }],
-    name: "balanceOf",
-    outputs: [{ name: "", type: "uint256" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
+const PROXY_ABI = [
   {
     constant: true,
     inputs: [],
@@ -26,40 +17,29 @@ const IMPLEMENTATION_ABI = [
   },
 ];
 
-async function getProvider(network) {
-  console.log("Getting provider for network:", network);
-
-  const rpcUrls = {
-    base: CONFIG.baseRpcUrl,
-    zora: CONFIG.zoraRpcUrl,
-  };
-
-  const rpcUrl = rpcUrls[network];
-  if (!rpcUrl) {
-    throw new Error(`No RPC URL found for network: ${network}`);
-  }
-
-  console.log("Creating Web3 instance...");
-  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
-
-  console.log("Web3 instance created successfully");
-  return web3;
-}
+const TOKEN_ABI = [
+  {
+    constant: true,
+    inputs: [{ name: "owner", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ name: "", type: "uint256" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+];
 
 export async function checkTokenOwnership(contractAddress, network) {
   try {
     console.log(
       `Checking ownership for contract ${contractAddress} on ${network}`
     );
-    const web3 = await getProvider(network);
+    const web3 = await getWeb3(network);
     const accounts = await web3.eth.getAccounts();
     const address = accounts[0];
 
     // First get the implementation address
-    const proxyContract = new web3.eth.Contract(
-      IMPLEMENTATION_ABI,
-      contractAddress
-    );
+    const proxyContract = new web3.eth.Contract(PROXY_ABI, contractAddress);
     const implementationAddress = await proxyContract.methods
       .implementation()
       .call();
@@ -68,10 +48,7 @@ export async function checkTokenOwnership(contractAddress, network) {
     );
 
     // Now interact with the implementation contract
-    const contract = new web3.eth.Contract(
-      IMPLEMENTATION_ABI,
-      implementationAddress
-    );
+    const contract = new web3.eth.Contract(TOKEN_ABI, implementationAddress);
     const balance = await contract.methods.balanceOf(address).call();
 
     console.log(`Balance for ${contractAddress}: ${balance}`);
