@@ -1,6 +1,5 @@
 // src/utils/web3Utils.js
 
-import { ethers } from "ethers";
 import { CONFIG } from "../config/constants";
 
 const BASE_MEMECOIN_CONTRACT = "0x39e6EED85927e0203c2ae9790eDaeB431B8e43c1";
@@ -14,19 +13,14 @@ export async function checkTokenOwnership(contractAddress, network) {
     );
     const provider = new ethers.JsonRpcProvider(CONFIG[`${network}RpcUrl`]);
 
-    // Get signer if MetaMask is available
-    let signer;
-    if (window.ethereum) {
-      const web3Provider = new ethers.BrowserProvider(window.ethereum);
-      signer = await web3Provider.getSigner();
-    }
+    // Get the connected address from Web3
+    const address = (
+      await window.ethereum.request({ method: "eth_accounts" })
+    )[0];
+    if (!address) return false;
 
-    const contract = new ethers.Contract(
-      contractAddress,
-      TOKEN_ABI,
-      signer || provider
-    );
-    const balance = await contract.balanceOf(await signer.getAddress());
+    const contract = new ethers.Contract(contractAddress, TOKEN_ABI, provider);
+    const balance = await contract.balanceOf(address);
 
     console.log(`Balance for ${contractAddress}: ${balance}`);
     return balance > 0n;

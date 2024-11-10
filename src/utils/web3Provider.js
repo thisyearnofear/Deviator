@@ -1,4 +1,3 @@
-import { ethers } from "ethers";
 import { CONFIG } from "../config/constants";
 
 export async function getProvider(network = null) {

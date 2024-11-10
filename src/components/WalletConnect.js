@@ -1,30 +1,45 @@
 // WalletConnect.js
 
-import { ethers } from "ethers";
 import { CONFIG } from "../config/constants";
-import { getProvider } from "../utils/web3Provider";
 
-async function getNetworkInfo() {
+let web3;
+
+async function setupWeb3() {
+  console.log("Setting up Web3...");
   try {
-    const provider = await getProvider();
-    const network = await provider.getNetwork();
-    console.log("Connected to network:", network.name);
-    return network.chainId;
+    if (typeof window.ethereum !== "undefined") {
+      web3 = new Web3(window.ethereum);
+    } else {
+      web3 = new Web3(new Web3.providers.HttpProvider(CONFIG.mainnetRpcUrl));
+    }
+    console.log("Web3 setup complete");
   } catch (error) {
-    console.error("Provider not initialized");
-    return null;
+    console.log("Web3 setup failed, continuing with limited functionality");
+    // Don't throw error, just continue
   }
 }
 
+async function getNetworkInfo() {
+  if (!web3) {
+    console.error("Web3 not initialized");
+    return;
+  }
+  const networkId = await web3.eth.net.getId();
+  console.log("Connected to network ID:", networkId);
+  return networkId;
+}
+
 async function getUserAddress() {
-  try {
-    const provider = await getProvider();
-    const signer = await provider.getSigner();
-    return await signer.getAddress();
-  } catch (error) {
-    console.error("Provider not initialized");
+  if (!web3) {
+    console.error("Web3 not initialized");
+    return;
+  }
+  const accounts = await web3.eth.getAccounts();
+  if (accounts.length === 0) {
+    console.error("No accounts found");
     return null;
   }
+  return accounts[0];
 }
 
 async function resolveENSName(address) {
@@ -106,31 +121,33 @@ export async function checkERC1155Balance(userAddress) {
   if (!userAddress) return false;
 
   const networks = [
-    { name: "base", rpcUrl: CONFIG.baseRpcUrl },
-    { name: "zora", rpcUrl: CONFIG.zoraRpcUrl },
+    { name: "Base", rpcUrl: CONFIG.baseRpcUrl },
+    { name: "Zora", rpcUrl: CONFIG.zoraRpcUrl },
   ];
 
   for (const network of networks) {
     try {
-      const provider = await getProvider(network.name);
-      const proxyContract = new ethers.Contract(
-        ERC1155_CONTRACT_ADDRESS,
+      const web3Instance = new Web3(network.rpcUrl);
+      const proxyContract = new web3Instance.eth.Contract(
         IMPLEMENTATION_ABI,
-        provider
+        ERC1155_CONTRACT_ADDRESS
       );
 
       // Get implementation address
-      const implementationAddress = await proxyContract.implementation();
+      const implementationAddress = await proxyContract.methods
+        .implementation()
+        .call();
       console.log(`Implementation address: ${implementationAddress}`);
 
       // Use implementation contract
-      const contract = new ethers.Contract(
-        ERC1155_CONTRACT_ADDRESS,
+      const contract = new web3Instance.eth.Contract(
         ERC1155_ABI,
-        provider
+        implementationAddress
       );
 
-      const balance = await contract.balanceOf(userAddress, TOKEN_ID);
+      const balance = await contract.methods
+        .balanceOf(userAddress, TOKEN_ID)
+        .call();
 
       console.log(`ERC1155 Balance on ${network.name}:`, balance);
       if (balance > 0) return true;
@@ -219,6 +236,7 @@ async function setupEventListeners() {
 async function initializeWalletConnect() {
   try {
     console.log("Initializing WalletConnect...");
+    await setupWeb3();
     await setupEventListeners();
 
     // Only check localStorage and update UI if there was a previous connection
