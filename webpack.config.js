@@ -10,6 +10,7 @@ module.exports = {
     filename: "[name].[contenthash].js",
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
+    clean: true,
   },
   module: {
     rules: [
@@ -25,19 +26,24 @@ module.exports = {
         },
       },
       {
-        test: /\.(glb|gltf|obj|mtl)$/,
-        use: {
-          loader: "file-loader",
-          options: {
-            outputPath: "models/",
-          },
+        test: /\.(png|jpg|jpeg|gif|svg)$/i,
+        type: "asset/resource",
+        generator: {
+          filename: "assets/images/[hash][ext][query]",
         },
       },
       {
-        test: /\.(png|jpg|jpeg|gif)$/i,
+        test: /\.(mp3|wav)$/i,
         type: "asset/resource",
         generator: {
-          filename: "images/[hash][ext][query]",
+          filename: "assets/sounds/[hash][ext][query]",
+        },
+      },
+      {
+        test: /\.(glb|gltf)$/i,
+        type: "asset/resource",
+        generator: {
+          filename: "assets/models/[hash][ext][query]",
         },
       },
     ],
@@ -65,28 +71,48 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: "models", to: "models", noErrorOnMissing: true },
-        { from: "textures", to: "textures", noErrorOnMissing: true },
-        { from: "sounds", to: "sounds", noErrorOnMissing: true },
-        { from: "public", to: ".", noErrorOnMissing: true },
+        {
+          from: "public",
+          to: ".",
+          noErrorOnMissing: true,
+          globOptions: {
+            ignore: ["**/index.html"],
+          },
+        },
+        {
+          from: "models",
+          to: "assets/models",
+          noErrorOnMissing: true,
+        },
+        {
+          from: "sounds",
+          to: "assets/sounds",
+          noErrorOnMissing: true,
+        },
+        {
+          from: "textures",
+          to: "assets/textures",
+          noErrorOnMissing: true,
+        },
       ],
     }),
   ],
   optimization: {
-    moduleIds: "deterministic",
+    minimize: true,
     runtimeChunk: "single",
     splitChunks: {
+      chunks: "all",
+      maxInitialRequests: Infinity,
+      minSize: 0,
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
-          name: "vendors",
-          chunks: "all",
-        },
-        threejs: {
-          test: /[\\/]node_modules[\\/]three[\\/]/,
-          name: "threejs",
-          chunks: "all",
-          priority: 10,
+          name(module) {
+            const packageName = module.context.match(
+              /[\\/]node_modules[\\/](.*?)([\\/]|$)/
+            )[1];
+            return `vendor.${packageName.replace("@", "")}`;
+          },
         },
       },
     },
@@ -95,6 +121,12 @@ module.exports = {
     hints: false,
     maxEntrypointSize: 512000,
     maxAssetSize: 512000,
+  },
+  externals: {
+    three: "THREE",
+    gsap: "gsap",
+    web3: "Web3",
+    ethers: "ethers",
   },
   devtool: "source-map",
 };
