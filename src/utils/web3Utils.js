@@ -9,18 +9,11 @@ const CONTRACT_ABI = [
   {
     constant: true,
     inputs: [
-      {
-        name: "_owner",
-        type: "address",
-      },
+      { name: "account", type: "address" },
+      { name: "id", type: "uint256" },
     ],
     name: "balanceOf",
-    outputs: [
-      {
-        name: "",
-        type: "uint256",
-      },
-    ],
+    outputs: [{ name: "", type: "uint256" }],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -35,11 +28,13 @@ async function getProvider(network) {
 
   console.log("Creating Web3 instance...");
   const web3 = new Web3(window.ethereum);
-  console.log("Web3 instance created successfully");
 
+  // Request account access if needed
+  await window.ethereum.request({ method: "eth_requestAccounts" });
+
+  console.log("Web3 instance created successfully");
   return web3;
 }
-
 export async function checkTokenOwnership(contractAddress, network) {
   try {
     console.log(
@@ -50,7 +45,7 @@ export async function checkTokenOwnership(contractAddress, network) {
     const address = accounts[0];
 
     const contract = new web3.eth.Contract(CONTRACT_ABI, contractAddress);
-    const balance = await contract.methods.balanceOf(address).call();
+    const balance = await contract.methods.balanceOf(address, 1).call(); // Added token ID parameter
 
     console.log(`Balance for ${contractAddress}: ${balance}`);
     return BigInt(balance) > 0n;
