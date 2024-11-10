@@ -5,15 +5,21 @@ import Web3 from "web3";
 const BASE_CONTRACT = "0x1dd4245bc6b1bbd43caf9a5033e887067852123d";
 const BASE_CONTRACT_2 = "0x39e6EED85927e0203c2ae9790eDaeB431B8e43c1";
 
-const CONTRACT_ABI = [
+const IMPLEMENTATION_ABI = [
   {
     constant: true,
-    inputs: [
-      { name: "account", type: "address" },
-      { name: "id", type: "uint256" },
-    ],
+    inputs: [{ name: "owner", type: "address" }],
     name: "balanceOf",
     outputs: [{ name: "", type: "uint256" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "implementation",
+    outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -22,19 +28,24 @@ const CONTRACT_ABI = [
 
 async function getProvider(network) {
   console.log("Getting provider for network:", network);
-  if (!window.ethereum) {
-    throw new Error("No ethereum provider found");
+
+  const rpcUrls = {
+    base: CONFIG.baseRpcUrl,
+    zora: CONFIG.zoraRpcUrl,
+  };
+
+  const rpcUrl = rpcUrls[network];
+  if (!rpcUrl) {
+    throw new Error(`No RPC URL found for network: ${network}`);
   }
 
   console.log("Creating Web3 instance...");
-  const web3 = new Web3(window.ethereum);
-
-  // Request account access if needed
-  await window.ethereum.request({ method: "eth_requestAccounts" });
+  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
 
   console.log("Web3 instance created successfully");
   return web3;
 }
+
 export async function checkTokenOwnership(contractAddress, network) {
   try {
     console.log(
@@ -44,8 +55,24 @@ export async function checkTokenOwnership(contractAddress, network) {
     const accounts = await web3.eth.getAccounts();
     const address = accounts[0];
 
-    const contract = new web3.eth.Contract(CONTRACT_ABI, contractAddress);
-    const balance = await contract.methods.balanceOf(address, 1).call(); // Added token ID parameter
+    // First get the implementation address
+    const proxyContract = new web3.eth.Contract(
+      IMPLEMENTATION_ABI,
+      contractAddress
+    );
+    const implementationAddress = await proxyContract.methods
+      .implementation()
+      .call();
+    console.log(
+      `Implementation address for ${contractAddress}: ${implementationAddress}`
+    );
+
+    // Now interact with the implementation contract
+    const contract = new web3.eth.Contract(
+      IMPLEMENTATION_ABI,
+      implementationAddress
+    );
+    const balance = await contract.methods.balanceOf(address).call();
 
     console.log(`Balance for ${contractAddress}: ${balance}`);
     return BigInt(balance) > 0n;
@@ -60,10 +87,13 @@ export async function checkTokenOwnership(contractAddress, network) {
 
 export async function checkSpecialEffectsAccess() {
   try {
+    // Check Base contract on Base network
     const baseOwnership = await checkTokenOwnership(BASE_CONTRACT, "base");
-    const baseOwnership2 = await checkTokenOwnership(BASE_CONTRACT_2, "base");
 
-    return baseOwnership || baseOwnership2;
+    // Check Zora contract on Zora network
+    const zoraOwnership = await checkTokenOwnership(BASE_CONTRACT_2, "zora");
+
+    return baseOwnership || zoraOwnership;
   } catch (error) {
     console.error("Error checking special effects access:", error);
     return false;

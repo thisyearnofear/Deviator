@@ -102,6 +102,27 @@ const ERC1155_ABI = [
 const ERC1155_CONTRACT_ADDRESS = "0x4a57b15E45d03bd85c8eE38dcFF9E2BF0e87dBCf";
 const TOKEN_ID = 1; // Adjust this if you're looking for a specific token ID
 
+const IMPLEMENTATION_ABI = [
+  {
+    constant: true,
+    inputs: [{ name: "owner", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ name: "", type: "uint256" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: "implementation",
+    outputs: [{ name: "", type: "address" }],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+];
+
 export async function checkERC1155Balance(userAddress) {
   if (!userAddress) return false;
 
@@ -113,10 +134,23 @@ export async function checkERC1155Balance(userAddress) {
   for (const network of networks) {
     try {
       const web3Instance = new Web3(network.rpcUrl);
-      const contract = new web3Instance.eth.Contract(
-        ERC1155_ABI,
+      const proxyContract = new web3Instance.eth.Contract(
+        IMPLEMENTATION_ABI,
         ERC1155_CONTRACT_ADDRESS
       );
+
+      // Get implementation address
+      const implementationAddress = await proxyContract.methods
+        .implementation()
+        .call();
+      console.log(`Implementation address: ${implementationAddress}`);
+
+      // Use implementation contract
+      const contract = new web3Instance.eth.Contract(
+        ERC1155_ABI,
+        implementationAddress
+      );
+
       const balance = await contract.methods
         .balanceOf(userAddress, TOKEN_ID)
         .call();
