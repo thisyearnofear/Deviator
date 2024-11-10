@@ -2,8 +2,7 @@
 
 import { getWeb3 } from "./web3Provider";
 
-const BASE_CONTRACT = "0x1dd4245bc6b1bbd43caf9a5033e887067852123d";
-const BASE_CONTRACT_2 = "0x39e6EED85927e0203c2ae9790eDaeB431B8e43c1";
+const BASE_MEMECOIN_CONTRACT = "0x39e6EED85927e0203c2ae9790eDaeB431B8e43c1";
 
 const TOKEN_ABI = [
   {
@@ -41,13 +40,13 @@ export async function checkTokenOwnership(contractAddress, network) {
 
 export async function checkSpecialEffectsAccess() {
   try {
-    // Check Base contract on Base network
-    const baseOwnership = await checkTokenOwnership(BASE_CONTRACT, "base");
-
-    // Check Zora contract on Zora network
-    const zoraOwnership = await checkTokenOwnership(BASE_CONTRACT_2, "zora");
-
-    return baseOwnership || zoraOwnership;
+    // Only check the Base memecoin contract for special effects
+    // sourcery skip: inline-immediately-returned-variable
+    const baseOwnership = await checkTokenOwnership(
+      BASE_MEMECOIN_CONTRACT,
+      "base"
+    );
+    return baseOwnership;
   } catch (error) {
     console.error("Error checking special effects access:", error);
     return false;
