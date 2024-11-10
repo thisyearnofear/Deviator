@@ -46,6 +46,8 @@ Gary's ByeBye'd 👋: ${enemiesKilled}
 Shots Fired: ${shotsFired}
 Damage Taken: ${lifesLost}
 
+@byegaryonbase
+
 `;
   }
 }
