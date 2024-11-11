@@ -12,25 +12,48 @@
     ],
     "routes": [
         {
-            "src": "/assets/(.*)",
+            "src": "/audio/(.*)",
             "headers": {
                 "cache-control": "public, max-age=31536000, immutable"
             },
-            "dest": "/assets/$1"
+            "dest": "/audio/$1"
+        },
+        {
+            "src": "/models/(.*)",
+            "headers": {
+                "cache-control": "public, max-age=31536000, immutable"
+            },
+            "dest": "/models/$1"
+        },
+        {
+            "src": "/images/(.*)",
+            "headers": {
+                "cache-control": "public, max-age=31536000, immutable"
+            },
+            "dest": "/images/$1"
         },
         {
             "src": "/(.*)\\.js",
             "headers": {
-                "cache-control": "public, max-age=31536000, immutable"
+                "cache-control": "public, max-age=31536000, immutable",
+                "content-type": "application/javascript"
             },
             "dest": "/$1.js"
         },
         {
-            "src": "/(.*)\\.map",
+            "src": "/(.*)\\.css",
+            "headers": {
+                "cache-control": "public, max-age=31536000, immutable",
+                "content-type": "text/css"
+            },
+            "dest": "/$1.css"
+        },
+        {
+            "src": "/(.*)\\.png",
             "headers": {
                 "cache-control": "public, max-age=31536000, immutable"
             },
-            "dest": "/$1.map"
+            "dest": "/$1.png"
         },
         {
             "handle": "filesystem"

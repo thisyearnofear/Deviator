@@ -9,7 +9,7 @@ module.exports = {
   output: {
     filename: "main.js",
     path: path.resolve(__dirname, "dist"),
-    publicPath: "/",
+    publicPath: "",
     clean: true,
   },
   module: {
@@ -29,44 +29,47 @@ module.exports = {
         test: /\.(mp3|wav)$/i,
         type: "asset/resource",
         generator: {
-          filename: "assets/audio/[name][ext]",
+          filename: "audio/[name][ext]",
         },
       },
       {
-        test: /\.(png|jpg|jpeg|gif)$/,
+        test: /\.(png|jpg|jpeg|gif|svg)$/i,
         type: "asset/resource",
         generator: {
           filename: "images/[name][ext]",
         },
       },
+      {
+        test: /\.(obj|mtl|gltf|glb)$/i,
+        type: "asset/resource",
+        generator: {
+          filename: "models/[name][ext]",
+        },
+      },
     ],
-  },
-  resolve: {
-    extensions: [".js"],
-    alias: {
-      "@": path.resolve(__dirname, "src/"),
-      components: path.resolve(__dirname, "src/components/"),
-      utils: path.resolve(__dirname, "src/utils/"),
-      managers: path.resolve(__dirname, "src/managers/"),
-    },
   },
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: "./index.html",
       filename: "index.html",
-      inject: false, // Don't auto-inject scripts
+      inject: "body",
     }),
     new CopyWebpackPlugin({
       patterns: [
         {
           from: "public",
-          to: ".",
+          to: "",
           noErrorOnMissing: true,
         },
         {
           from: "audio",
           to: "audio",
+          noErrorOnMissing: true,
+        },
+        {
+          from: "models",
+          to: "models",
           noErrorOnMissing: true,
         },
         {
@@ -77,23 +80,22 @@ module.exports = {
           from: "*.png",
           to: "[name][ext]",
         },
-        {
-          from: "audio",
-          to: "assets/audio",
-          noErrorOnMissing: true,
-        },
       ],
     }),
   ],
+  resolve: {
+    extensions: [".js"],
+    alias: {
+      "@": path.resolve(__dirname, "src/"),
+      components: path.resolve(__dirname, "src/components/"),
+      utils: path.resolve(__dirname, "src/utils/"),
+      managers: path.resolve(__dirname, "src/managers/"),
+    },
+  },
   optimization: {
     minimize: true,
   },
   performance: {
     hints: false,
-  },
-  externals: {
-    three: "THREE",
-    gsap: "gsap",
-    ethers: "ethers",
   },
 };
