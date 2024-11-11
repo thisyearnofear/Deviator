@@ -280,22 +280,52 @@
     </div>
 
     <script>
+      // Initialize audio context
+      window.AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
       window.initAudioContext = function () {
-        if (!window.gameAudioContext) {
-          const AudioContext = window.AudioContext || window.webkitAudioContext;
-          window.gameAudioContext = new AudioContext();
-        }
-        if (window.gameAudioContext.state === "suspended") {
-          window.gameAudioContext.resume();
-        }
+        return new Promise((resolve) => {
+          if (!window.gameAudioContext) {
+            window.gameAudioContext = new AudioContextClass();
+          }
+
+          if (window.gameAudioContext.state === "suspended") {
+            window.gameAudioContext.resume();
+          }
+
+          window.gameAudioContext.onstatechange = function () {
+            if (window.gameAudioContext.state === "running") {
+              resolve(window.gameAudioContext);
+            }
+          };
+
+          resolve(window.gameAudioContext);
+        });
       };
 
-      // Initialize on user interaction
-      window.addEventListener("click", initAudioContext, { once: true });
-      window.addEventListener("touchstart", initAudioContext, { once: true });
+      // Pre-initialize on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        window.gameAudioContext = new AudioContextClass();
+      });
+
+      // Ensure it's running on user interaction
+      ["click", "touchstart"].forEach((event) => {
+        document.addEventListener(
+          event,
+          () => {
+            if (
+              window.gameAudioContext &&
+              window.gameAudioContext.state !== "running"
+            ) {
+              window.gameAudioContext.resume();
+            }
+          },
+          { once: true }
+        );
+      });
     </script>
 
-    <!-- Load the webpack bundles -->
+    <!-- Load the game scripts -->
     <script defer src="/main.js"></script>
   </body>
 </html>

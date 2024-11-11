@@ -26,10 +26,10 @@ module.exports = {
         },
       },
       {
-        test: /\.(mp3|wav)$/,
+        test: /\.(mp3|wav)$/i,
         type: "asset/resource",
         generator: {
-          filename: "audio/[name][ext]",
+          filename: "assets/audio/[name][ext]",
         },
       },
       {
@@ -76,6 +76,11 @@ module.exports = {
         {
           from: "*.png",
           to: "[name][ext]",
+        },
+        {
+          from: "audio",
+          to: "assets/audio",
+          noErrorOnMissing: true,
         },
       ],
     }),
